@@ -1010,17 +1010,33 @@
         },
 
         initLeafletMap() {
+          const topoLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI',
+            maxZoom: 18
+          });
+
+          const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+          });
+
+          const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics',
+            maxZoom: 18
+          });
+
           this.map = L.map('ryokan-map', {
             center: [35.24, 138.85],
             zoom: 10,
-            scrollWheelZoom: false
+            scrollWheelZoom: false,
+            layers: [topoLayer]
           });
 
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 18
-          }).addTo(this.map);
+          L.control.layers({
+            '🗻 Terrain & English Labels': topoLayer,
+            '🗺️ Street Map (OSM)': osmLayer,
+            '🛰️ Satellite View': satelliteLayer
+          }, null, { position: 'topright' }).addTo(this.map);
 
           // Add Mt. Fuji Summit Landmark Pin
           const fujiIcon = L.divIcon({
