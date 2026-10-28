@@ -88,6 +88,77 @@
     .custom-pin:hover {
       transform: scale(1.18);
     }
+    /* Explicit 3-tier status styles (Green / Yellow / Red) */
+    tr.row-yellow, tr.row-yellow > td {
+      background-color: #FEFCE8 !important;
+    }
+    tr.row-yellow:hover, tr.row-yellow:hover > td {
+      background-color: #FEF9C3 !important;
+    }
+    tr.row-red, tr.row-red > td {
+      background-color: #FFF1F2 !important;
+    }
+    tr.row-red:hover, tr.row-red:hover > td {
+      background-color: #FFE4E6 !important;
+    }
+    .card-yellow {
+      border: 2px solid #EAB308 !important;
+    }
+    .card-red {
+      border: 2px solid #F43F5E !important;
+    }
+    .banner-yellow {
+      background-color: #FEF08A !important;
+      color: #0F1E36 !important;
+      border-bottom: 1px solid #EAB308 !important;
+    }
+    .banner-red {
+      background-color: #BE123C !important;
+      color: #FFFFFF !important;
+    }
+    .pill-green {
+      background-color: #047857 !important;
+      color: #FFFFFF !important;
+    }
+    .pill-yellow {
+      background-color: #FACC15 !important;
+      color: #0F1E36 !important;
+      border: 1px solid #CA8A04 !important;
+    }
+    .pill-red {
+      background-color: #E11D48 !important;
+      color: #FFFFFF !important;
+    }
+    .badge-green {
+      background-color: #D1FAE5 !important;
+      color: #065F46 !important;
+      border: 1px solid #6EE7B7 !important;
+    }
+    .badge-yellow {
+      background-color: #FEF08A !important;
+      color: #0F1E36 !important;
+      border: 1px solid #EAB308 !important;
+    }
+    .badge-red {
+      background-color: #FFE4E6 !important;
+      color: #9F1239 !important;
+      border: 1px solid #FDA4AF !important;
+    }
+    .policy-box-green {
+      background-color: #ECFDF5 !important;
+      border: 1px solid #A7F3D0 !important;
+      color: #1E293B !important;
+    }
+    .policy-box-yellow {
+      background-color: #FEFCE8 !important;
+      border: 1px solid #FACC15 !important;
+      color: #1E293B !important;
+    }
+    .policy-box-red {
+      background-color: #FFF1F2 !important;
+      border: 1px solid #FDA4AF !important;
+      color: #881337 !important;
+    }
     .leaflet-popup-content-wrapper {
       border-radius: 12px;
       padding: 2px;
@@ -267,7 +338,7 @@
           <span class="text-xs font-bold uppercase tracking-widest text-hinoki-600">Geographic Overview</span>
           <h2 class="font-serif text-3xl font-bold text-ai-900">1. Interactive Regional Map &amp; Sightlines</h2>
           <p class="text-sm text-slate-600 mt-1">
-            Click any numbered pin (<strong class="text-emerald-700">Green = Public/Outdoor Bath Available</strong> &bull; <strong class="text-amber-700">Yellow = In-Room Onsen Only (No Public Bath)</strong> &bull; <strong class="text-rose-700">Red = Public Bath Tattoo Ban</strong>) to preview the ryokan, or click <em>Locate on Map</em> on any card below.
+            Click any numbered pin (<strong class="text-emerald-700">Green = Public/Outdoor Bath Available</strong> &bull; <strong style="color:#A16207;">Yellow = In-Room Onsen Only (No Public Bath)</strong> &bull; <strong class="text-rose-700">Red = Public Bath Tattoo Ban</strong>) to preview the ryokan, or click <em>Locate on Map</em> on any card below.
           </p>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -285,15 +356,15 @@
         <div class="px-4 py-3 bg-washi-50 border-t border-washi-200 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
           <div class="flex flex-wrap items-center gap-4">
             <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-800">
-              <span class="w-3 h-3 rounded-full bg-emerald-600 inline-block"></span>
+              <span class="w-3.5 h-3.5 rounded-full inline-block" style="background:#047857;"></span>
               #1, #2, #4, #5: Public Bath Available (Cover Sticker OK or Private Baths)
             </span>
-            <span class="inline-flex items-center gap-1.5 font-semibold text-amber-800">
-              <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+            <span class="inline-flex items-center gap-1.5 font-semibold text-slate-800">
+              <span class="w-3.5 h-3.5 rounded-full inline-block" style="background:#FACC15;border:1px solid #CA8A04;"></span>
               #6 &amp; #7: In-Room Onsen Only (No Public Bath)
             </span>
             <span class="inline-flex items-center gap-1.5 font-semibold text-rose-800">
-              <span class="w-3 h-3 rounded-full bg-rose-600 inline-block"></span>
+              <span class="w-3.5 h-3.5 rounded-full inline-block" style="background:#E11D48;"></span>
               #3: Tattoos Strictly Banned in Public Bath
             </span>
           </div>
@@ -329,12 +400,12 @@
             </thead>
             <tbody class="divide-y divide-washi-200">
               <template x-for="r in filteredRyokans" :key="r.id">
-                <tr :class="r.alertType === 'red' ? 'bg-rose-50/70 hover:bg-rose-100/60' : (r.alertType === 'yellow' ? 'bg-amber-50/60 hover:bg-amber-100/50' : 'hover:bg-washi-50')" class="transition">
+                <tr :class="r.alertType === 'red' ? 'row-red' : (r.alertType === 'yellow' ? 'row-yellow' : 'hover:bg-washi-50')" class="transition">
                   <!-- Col 1: Name & Region -->
                   <td class="py-4 px-4 align-top min-w-[210px]">
                     <div class="flex items-start gap-2.5">
-                      <span :class="r.alertType === 'red' ? 'bg-rose-600' : (r.alertType === 'yellow' ? 'bg-amber-600' : 'bg-emerald-700')"
-                            class="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5"
+                      <span :class="r.alertType === 'red' ? 'pill-red' : (r.alertType === 'yellow' ? 'pill-yellow' : 'pill-green')"
+                            class="w-6 h-6 rounded-full text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5"
                             x-text="r.id"></span>
                       <div>
                         <a :href="'#ryokan-' + r.id" class="font-bold text-base text-ai-900 hover:text-amber-700 underline decoration-washi-300" x-text="r.nameEn"></a>
@@ -360,7 +431,7 @@
                   <!-- Col 3: Tattoo & Public Bath Policy -->
                   <td class="py-4 px-4 align-top min-w-[240px]">
                     <span :class="r.tattooBadgeClass" class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold mb-1.5" x-text="r.tattooBadge"></span>
-                    <p :class="r.alertType === 'red' ? 'text-rose-900 font-semibold' : (r.alertType === 'yellow' ? 'text-amber-950 font-medium' : 'text-slate-700')" class="text-xs leading-relaxed" x-text="r.tattooShort"></p>
+                    <p :class="r.alertType === 'red' ? 'text-rose-900 font-semibold' : 'text-slate-800 font-medium'" class="text-xs leading-relaxed" x-text="r.tattooShort"></p>
                   </td>
 
                   <!-- Col 4: Ratings -->
@@ -398,16 +469,16 @@
 
       <template x-for="r in filteredRyokans" :key="'card-' + r.id">
         <article :id="'ryokan-' + r.id"
-                 :class="r.alertType === 'red' ? 'border-2 border-rose-400' : (r.alertType === 'yellow' ? 'border-2 border-amber-300' : 'border border-washi-200')"
+                 :class="r.alertType === 'red' ? 'card-red' : (r.alertType === 'yellow' ? 'card-yellow' : 'border border-washi-200')"
                  class="wa-card rounded-2xl overflow-hidden scroll-mt-36 transition">
 
           <!-- Top Alert Banner (#3 Red Dealbreaker vs #6/#7 Yellow Info Alert) -->
           <template x-if="r.dealbreakerBanner">
-            <div :class="r.alertType === 'red' ? 'bg-rose-700 text-white' : 'bg-amber-100 text-amber-950 border-b border-amber-300'"
+            <div :class="r.alertType === 'red' ? 'banner-red' : 'banner-yellow'"
                  class="px-5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2">
               <span x-text="r.dealbreakerBanner"></span>
-              <span :class="r.alertType === 'red' ? 'bg-white/20 text-white' : 'bg-amber-200/80 text-amber-900 border border-amber-400/50'"
-                    class="uppercase tracking-wider text-[11px] px-2 py-0.5 rounded shrink-0"
+              <span :style="r.alertType === 'red' ? 'background:rgba(255,255,255,0.2);color:#fff;' : 'background:#FACC15;color:#0F1E36;border:1px solid #CA8A04;'"
+                    class="uppercase tracking-wider text-[11px] font-bold px-2 py-0.5 rounded shrink-0"
                     x-text="r.alertType === 'red' ? 'Heads Up for Group' : 'Good to Note'"></span>
             </div>
           </template>
@@ -417,8 +488,8 @@
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div>
                 <div class="flex flex-wrap items-center gap-2 mb-2">
-                  <span :class="r.alertType === 'red' ? 'bg-rose-600' : (r.alertType === 'yellow' ? 'bg-amber-600' : 'bg-ai-900')"
-                        class="px-3 py-1 rounded-full text-white text-xs font-bold uppercase tracking-wider"
+                  <span :class="r.alertType === 'red' ? 'pill-red' : (r.alertType === 'yellow' ? 'pill-yellow' : 'bg-ai-900 text-white')"
+                        class="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider"
                         x-text="'Option #' + r.id"></span>
                   <span class="px-3 py-1 rounded-full bg-washi-200/80 text-ai-900 text-xs font-bold" x-text="r.areaBadge"></span>
                   <span :class="r.tattooBadgeClass" class="px-3 py-1 rounded-full text-xs font-bold" x-text="r.tattooBadge"></span>
@@ -517,17 +588,17 @@
             <!-- Right 5 Cols: Tattoo Policy, Group Dining & Reviewer Verdict -->
             <div class="lg:col-span-5 space-y-4">
               <!-- Tattoo & Public Bath Box -->
-              <div :class="r.alertType === 'red' ? 'bg-rose-50 border-rose-300' : (r.alertType === 'yellow' ? 'bg-amber-50/80 border-amber-300' : 'bg-emerald-50/70 border-emerald-200')"
-                   class="rounded-xl p-4 border">
+              <div :class="r.alertType === 'red' ? 'policy-box-red' : (r.alertType === 'yellow' ? 'policy-box-yellow' : 'policy-box-green')"
+                   class="rounded-xl p-4">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-xs font-bold uppercase tracking-wider"
-                        :class="r.alertType === 'red' ? 'text-rose-800' : (r.alertType === 'yellow' ? 'text-amber-900' : 'text-emerald-900')">
+                        :style="r.alertType === 'red' ? 'color:#9F1239;' : (r.alertType === 'yellow' ? 'color:#0F1E36;' : 'color:#065F46;')">
                     ♨️ Public Bath &amp; Tattoo Policy
                   </span>
                   <span :class="r.tattooBadgeClass" class="px-2 py-0.5 rounded text-[11px] font-bold" x-text="r.tattooBadge"></span>
                 </div>
                 <p class="text-xs sm:text-sm leading-relaxed"
-                   :class="r.alertType === 'red' ? 'text-rose-900' : (r.alertType === 'yellow' ? 'text-amber-950' : 'text-slate-700')"
+                   :style="r.alertType === 'red' ? 'color:#881337;' : 'color:#1E293B;'"
                    x-html="r.tattooDetailHtml"></p>
               </div>
 
@@ -714,7 +785,7 @@
             dealbreakerWarning: false,
             dealbreakerBanner: '',
             tattooBadge: 'Public Bath OK w/ Cover Sticker',
-            tattooBadgeClass: 'bg-emerald-100 text-emerald-900 border border-emerald-300',
+            tattooBadgeClass: 'badge-green',
             tattooShort: 'Tattoos 100% fine in room bath. Public bath allows small/moderate tattoos if completely covered with waterproof cover tape/stickers.',
             ikkyu: 4.79,
             rakuten: 4.75,
@@ -758,7 +829,7 @@
             dealbreakerWarning: false,
             dealbreakerBanner: '',
             tattooBadge: 'Public Bath OK w/ Front-Desk Sticker',
-            tattooBadgeClass: 'bg-emerald-100 text-emerald-900 border border-emerald-300',
+            tattooBadgeClass: 'badge-green',
             tattooShort: 'Explicitly allows tattooed guests in the public baths if covered with the inn’s designated waterproof cover stickers (sold at front desk).',
             ikkyu: 4.71,
             rakuten: 4.68,
@@ -803,7 +874,7 @@
             dealbreakerWarning: true,
             dealbreakerBanner: '⚠️ PUBLIC BATH TATTOO BAN (#3): Tattoos are strictly prohibited in Kaneyamaen’s communal & 10th-floor rooftop public baths (in-room private onsen bath or paid private family bath only).',
             tattooBadge: '⚠️ No Tattoos in Public Bath',
-            tattooBadgeClass: 'bg-rose-100 text-rose-900 border border-rose-300',
+            tattooBadgeClass: 'badge-red',
             tattooShort: 'Strictly prohibits all tattoos in the communal & 10F rooftop public baths. Tattooed guests bathe in their private in-room open-air onsen (or paid private bath).',
             ikkyu: 4.72,
             rakuten: 4.70,
@@ -848,7 +919,7 @@
             dealbreakerWarning: false,
             dealbreakerBanner: '',
             tattooBadge: 'Has Private Family Baths + Rooftop Footbath',
-            tattooBadgeClass: 'bg-emerald-100 text-emerald-900 border border-emerald-300',
+            tattooBadgeClass: 'badge-green',
             tattooShort: 'Exposed tattoos restricted in main public bath, but offers paid private reservable baths (貸切風呂) + 100% private in-room onsen.',
             ikkyu: 4.57,
             rakuten: 4.70,
@@ -893,7 +964,7 @@
             dealbreakerWarning: false,
             dealbreakerBanner: '',
             tattooBadge: '★ Most Tattoo-Friendly (3 Free Private Outdoor Baths)',
-            tattooBadgeClass: 'bg-emerald-100 text-emerald-900 border border-emerald-300',
+            tattooBadgeClass: 'badge-green',
             tattooShort: 'Has 3 large FREE outdoor private baths (貸切露天風呂, no reservation needed) where tattoos are 100% OK + tattoo-tolerant communal bath.',
             ikkyu: 4.69,
             rakuten: 4.64,
@@ -938,7 +1009,7 @@
             dealbreakerWarning: false,
             dealbreakerBanner: 'ℹ️ Note on Public Baths (#6): Fugaku Gunjo does not have a communal public bath (大浴場なし)—all bathing is in your 130㎡ suite’s private open-air deck bath (tattoos 100% OK). Good to note if anyone wants to try both!',
             tattooBadge: 'ℹ️ In-Room Onsen Only (No Public Bath)',
-            tattooBadgeClass: 'bg-amber-100 text-amber-900 border border-amber-300',
+            tattooBadgeClass: 'badge-yellow',
             tattooShort: 'No communal public bath on property (大浴場なし). All bathing is in your massive 130㎡ suite’s private open-air deck bath (tattoos 100% OK).',
             ikkyu: 4.64,
             rakuten: 4.54,
@@ -983,7 +1054,7 @@
             dealbreakerWarning: false,
             dealbreakerBanner: 'ℹ️ Note on Public Baths (#7): Hakone Yuyado Zen is a 10-room boutique inn with no communal public bath (大浴場なし)—all bathing is in your private in-room milky sulfur onsen (tattoos 100% OK).',
             tattooBadge: 'ℹ️ In-Room Onsen Only (No Public Bath)',
-            tattooBadgeClass: 'bg-amber-100 text-amber-900 border border-amber-300',
+            tattooBadgeClass: 'badge-yellow',
             tattooShort: 'No communal public bath on property (大浴場なし). All 10 rooms have private free-flowing milky Owakudani sulfur onsen baths (tattoos 100% OK).',
             ikkyu: 4.75,
             rakuten: 4.65,
@@ -1117,12 +1188,13 @@
 
           const bounds = [[35.3606, 138.7274]];
           this.filteredRyokans.forEach(r => {
-            const bgColor = r.alertType === 'red' ? '#E11D48' : (r.alertType === 'yellow' ? '#D97706' : '#047857');
-            const badgeBg = r.alertType === 'red' ? '#FFE4E6' : (r.alertType === 'yellow' ? '#FEF3C7' : '#D1FAE5');
-            const badgeColor = r.alertType === 'red' ? '#9F1239' : (r.alertType === 'yellow' ? '#92400E' : '#065F46');
+            const bgColor = r.alertType === 'red' ? '#E11D48' : (r.alertType === 'yellow' ? '#FACC15' : '#047857');
+            const textColor = r.alertType === 'yellow' ? '#0F1E36' : '#FFFFFF';
+            const badgeBg = r.alertType === 'red' ? '#FFE4E6' : (r.alertType === 'yellow' ? '#FEF08A' : '#D1FAE5');
+            const badgeColor = r.alertType === 'red' ? '#9F1239' : (r.alertType === 'yellow' ? '#0F1E36' : '#065F46');
             const icon = L.divIcon({
               className: '',
-              html: `<div class="custom-pin" style="background:${bgColor};">${r.id}</div>`,
+              html: `<div class="custom-pin" style="background:${bgColor};color:${textColor};">${r.id}</div>`,
               iconSize: [34, 34],
               iconAnchor: [17, 17],
               popupAnchor: [0, -18]
