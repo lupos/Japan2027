@@ -267,7 +267,7 @@
           <span class="text-xs font-bold uppercase tracking-widest text-hinoki-600">Geographic Overview</span>
           <h2 class="font-serif text-3xl font-bold text-ai-900">1. Interactive Regional Map &amp; Sightlines</h2>
           <p class="text-sm text-slate-600 mt-1">
-            Click any numbered pin (<strong class="text-emerald-700">Green = Public/Outdoor Bath Available w/ Sticker or Free Private Bath</strong> &bull; <strong class="text-rose-700">Red = No Public Bath or Strict Public Bath Tattoo Ban</strong>) to preview the ryokan, or click <em>Locate on Map</em> on any card below.
+            Click any numbered pin (<strong class="text-emerald-700">Green = Public/Outdoor Bath Available</strong> &bull; <strong class="text-amber-700">Yellow = In-Room Onsen Only (No Public Bath)</strong> &bull; <strong class="text-rose-700">Red = Public Bath Tattoo Ban</strong>) to preview the ryokan, or click <em>Locate on Map</em> on any card below.
           </p>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -286,11 +286,15 @@
           <div class="flex flex-wrap items-center gap-4">
             <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-800">
               <span class="w-3 h-3 rounded-full bg-emerald-600 inline-block"></span>
-              #1, #2, #4, #5: Has Public Bath (Cover Sticker OK or Free Outdoor Private Baths)
+              #1, #2, #4, #5: Public Bath Available (Cover Sticker OK or Private Baths)
+            </span>
+            <span class="inline-flex items-center gap-1.5 font-semibold text-amber-800">
+              <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+              #6 &amp; #7: In-Room Onsen Only (No Public Bath)
             </span>
             <span class="inline-flex items-center gap-1.5 font-semibold text-rose-800">
               <span class="w-3 h-3 rounded-full bg-rose-600 inline-block"></span>
-              #6 &amp; #7: NO Communal Public Bath &nbsp;|&nbsp; #3: Tattoos Strictly Banned in Public Bath
+              #3: Tattoos Strictly Banned in Public Bath
             </span>
           </div>
           <a href="https://www.google.com/maps/dir/Shuhokaku+Kogetsu,+2312+Kawaguchi,+Fujikawaguchiko/Konansou,+4020+Funatsu,+Fujikawaguchiko/Hotel+Kaneyamaen,+6283+Kamiyoshida,+Fujiyoshida/Hakone+Yuyado+Zen,+1245-96+Sengokuhara,+Hakone/Mishima+Station,+Shizuoka/Izu+Mitsuhama+Onsen+Shotokan,+7+Mito,+Numazu/Fugaku+Hanabusa,+1148-1+Kona,+Izunokuni/Fugaku+Gunjo,+2461-1+Yagisawa,+Izu/"
@@ -325,11 +329,11 @@
             </thead>
             <tbody class="divide-y divide-washi-200">
               <template x-for="r in filteredRyokans" :key="r.id">
-                <tr :class="r.dealbreakerWarning ? 'bg-rose-50/70 hover:bg-rose-100/60' : 'hover:bg-washi-50'" class="transition">
+                <tr :class="r.alertType === 'red' ? 'bg-rose-50/70 hover:bg-rose-100/60' : (r.alertType === 'yellow' ? 'bg-amber-50/60 hover:bg-amber-100/50' : 'hover:bg-washi-50')" class="transition">
                   <!-- Col 1: Name & Region -->
                   <td class="py-4 px-4 align-top min-w-[210px]">
                     <div class="flex items-start gap-2.5">
-                      <span :class="r.dealbreakerWarning ? 'bg-rose-600' : 'bg-emerald-700'"
+                      <span :class="r.alertType === 'red' ? 'bg-rose-600' : (r.alertType === 'yellow' ? 'bg-amber-600' : 'bg-emerald-700')"
                             class="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5"
                             x-text="r.id"></span>
                       <div>
@@ -356,7 +360,7 @@
                   <!-- Col 3: Tattoo & Public Bath Policy -->
                   <td class="py-4 px-4 align-top min-w-[240px]">
                     <span :class="r.tattooBadgeClass" class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold mb-1.5" x-text="r.tattooBadge"></span>
-                    <p :class="r.dealbreakerWarning ? 'text-rose-900 font-semibold' : 'text-slate-700'" class="text-xs leading-relaxed" x-text="r.tattooShort"></p>
+                    <p :class="r.alertType === 'red' ? 'text-rose-900 font-semibold' : (r.alertType === 'yellow' ? 'text-amber-950 font-medium' : 'text-slate-700')" class="text-xs leading-relaxed" x-text="r.tattooShort"></p>
                   </td>
 
                   <!-- Col 4: Ratings -->
@@ -394,14 +398,17 @@
 
       <template x-for="r in filteredRyokans" :key="'card-' + r.id">
         <article :id="'ryokan-' + r.id"
-                 :class="r.dealbreakerWarning ? 'border-2 border-rose-400' : 'border border-washi-200'"
+                 :class="r.alertType === 'red' ? 'border-2 border-rose-400' : (r.alertType === 'yellow' ? 'border-2 border-amber-300' : 'border border-washi-200')"
                  class="wa-card rounded-2xl overflow-hidden scroll-mt-36 transition">
 
-          <!-- Dealbreaker Top Banner for #6, #3, #7 -->
+          <!-- Top Alert Banner (#3 Red Dealbreaker vs #6/#7 Yellow Info Alert) -->
           <template x-if="r.dealbreakerBanner">
-            <div class="bg-rose-700 text-white px-5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2">
+            <div :class="r.alertType === 'red' ? 'bg-rose-700 text-white' : 'bg-amber-100 text-amber-950 border-b border-amber-300'"
+                 class="px-5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2">
               <span x-text="r.dealbreakerBanner"></span>
-              <span class="uppercase tracking-wider text-[11px] bg-white/20 px-2 py-0.5 rounded shrink-0">Heads Up for Group</span>
+              <span :class="r.alertType === 'red' ? 'bg-white/20 text-white' : 'bg-amber-200/80 text-amber-900 border border-amber-400/50'"
+                    class="uppercase tracking-wider text-[11px] px-2 py-0.5 rounded shrink-0"
+                    x-text="r.alertType === 'red' ? 'Heads Up for Group' : 'Good to Note'"></span>
             </div>
           </template>
 
@@ -410,7 +417,7 @@
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div>
                 <div class="flex flex-wrap items-center gap-2 mb-2">
-                  <span :class="r.dealbreakerWarning ? 'bg-rose-600' : 'bg-ai-900'"
+                  <span :class="r.alertType === 'red' ? 'bg-rose-600' : (r.alertType === 'yellow' ? 'bg-amber-600' : 'bg-ai-900')"
                         class="px-3 py-1 rounded-full text-white text-xs font-bold uppercase tracking-wider"
                         x-text="'Option #' + r.id"></span>
                   <span class="px-3 py-1 rounded-full bg-washi-200/80 text-ai-900 text-xs font-bold" x-text="r.areaBadge"></span>
@@ -510,17 +517,17 @@
             <!-- Right 5 Cols: Tattoo Policy, Group Dining & Reviewer Verdict -->
             <div class="lg:col-span-5 space-y-4">
               <!-- Tattoo & Public Bath Box -->
-              <div :class="r.dealbreakerWarning ? 'bg-rose-50 border-rose-300' : 'bg-emerald-50/70 border-emerald-200'"
+              <div :class="r.alertType === 'red' ? 'bg-rose-50 border-rose-300' : (r.alertType === 'yellow' ? 'bg-amber-50/80 border-amber-300' : 'bg-emerald-50/70 border-emerald-200')"
                    class="rounded-xl p-4 border">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-xs font-bold uppercase tracking-wider"
-                        :class="r.dealbreakerWarning ? 'text-rose-800' : 'text-emerald-900'">
+                        :class="r.alertType === 'red' ? 'text-rose-800' : (r.alertType === 'yellow' ? 'text-amber-900' : 'text-emerald-900')">
                     ♨️ Public Bath &amp; Tattoo Policy
                   </span>
                   <span :class="r.tattooBadgeClass" class="px-2 py-0.5 rounded text-[11px] font-bold" x-text="r.tattooBadge"></span>
                 </div>
                 <p class="text-xs sm:text-sm leading-relaxed"
-                   :class="r.dealbreakerWarning ? 'text-rose-900' : 'text-slate-700'"
+                   :class="r.alertType === 'red' ? 'text-rose-900' : (r.alertType === 'yellow' ? 'text-amber-950' : 'text-slate-700')"
                    x-html="r.tattooDetailHtml"></p>
               </div>
 
@@ -703,6 +710,7 @@
             waterShort: '100% Real Natural Onsen (天然温泉)',
             diningShort: 'Yes — Dedicated Private Dining Room (個室食事処)',
             tattooFriendlyPublic: true,
+            alertType: 'none',
             dealbreakerWarning: false,
             dealbreakerBanner: '',
             tattooBadge: 'Public Bath OK w/ Cover Sticker',
@@ -746,6 +754,7 @@
             waterShort: '100% Real Natural Onsen (天然温泉)',
             diningShort: 'Yes — Private Ryotei Dining Room (料亭個室)',
             tattooFriendlyPublic: true,
+            alertType: 'none',
             dealbreakerWarning: false,
             dealbreakerBanner: '',
             tattooBadge: 'Public Bath OK w/ Front-Desk Sticker',
@@ -790,8 +799,9 @@
             waterShort: '100% Real Natural Onsen (pH 10.3)',
             diningShort: 'Yes — Private Ryotei (Request ≥3 days prior)',
             tattooFriendlyPublic: false,
+            alertType: 'red',
             dealbreakerWarning: true,
-            dealbreakerBanner: '⚠️ PUBLIC BATH TATTOO BAN: Tattoos are strictly prohibited in Kaneyamaen’s communal & 10th-floor rooftop public baths (in-room private onsen bath or paid private family bath only).',
+            dealbreakerBanner: '⚠️ PUBLIC BATH TATTOO BAN (#3): Tattoos are strictly prohibited in Kaneyamaen’s communal & 10th-floor rooftop public baths (in-room private onsen bath or paid private family bath only).',
             tattooBadge: '⚠️ No Tattoos in Public Bath',
             tattooBadgeClass: 'bg-rose-100 text-rose-900 border border-rose-300',
             tattooShort: 'Strictly prohibits all tattoos in the communal & 10F rooftop public baths. Tattooed guests bathe in their private in-room open-air onsen (or paid private bath).',
@@ -834,10 +844,11 @@
             waterShort: '100% Real Natural Onsen (天然温泉)',
             diningShort: 'Yes — Private Ryotei Dining Room (料亭個室)',
             tattooFriendlyPublic: true,
+            alertType: 'none',
             dealbreakerWarning: false,
             dealbreakerBanner: '',
             tattooBadge: 'Has Private Family Baths + Rooftop Footbath',
-            tattooBadgeClass: 'bg-amber-100 text-amber-900 border border-amber-300',
+            tattooBadgeClass: 'bg-emerald-100 text-emerald-900 border border-emerald-300',
             tattooShort: 'Exposed tattoos restricted in main public bath, but offers paid private reservable baths (貸切風呂) + 100% private in-room onsen.',
             ikkyu: 4.57,
             rakuten: 4.70,
@@ -878,6 +889,7 @@
             waterShort: '100% Free-Flowing Natural Onsen (源泉かけ流し)',
             diningShort: 'Yes — 100% Private Dining Rooms (完全個室食事処)',
             tattooFriendlyPublic: true,
+            alertType: 'none',
             dealbreakerWarning: false,
             dealbreakerBanner: '',
             tattooBadge: '★ Most Tattoo-Friendly (3 Free Private Outdoor Baths)',
@@ -922,11 +934,12 @@
             waterShort: '100% Real Natural Onsen (天然温泉)',
             diningShort: 'Yes — Private Dining (Request 6-pax setup at booking)',
             tattooFriendlyPublic: false,
-            dealbreakerWarning: true,
-            dealbreakerBanner: '⚠️ POTENTIAL DEALBREAKER (#6): Fugaku Gunjo does NOT have a communal public bath (大浴場なし). All bathing is 100% in your private suite open-air bath.',
-            tattooBadge: '⚠️ NO Communal Public Bath',
-            tattooBadgeClass: 'bg-rose-100 text-rose-900 border border-rose-300',
-            tattooShort: 'No communal public bath on property (大浴場なし). 100% of bathing is in your massive 130㎡ suite’s private open-air deck bath.',
+            alertType: 'yellow',
+            dealbreakerWarning: false,
+            dealbreakerBanner: 'ℹ️ Note on Public Baths (#6): Fugaku Gunjo does not have a communal public bath (大浴場なし)—all bathing is in your 130㎡ suite’s private open-air deck bath (tattoos 100% OK). Good to note if anyone wants to try both!',
+            tattooBadge: 'ℹ️ In-Room Onsen Only (No Public Bath)',
+            tattooBadgeClass: 'bg-amber-100 text-amber-900 border border-amber-300',
+            tattooShort: 'No communal public bath on property (大浴場なし). All bathing is in your massive 130㎡ suite’s private open-air deck bath (tattoos 100% OK).',
             ikkyu: 4.64,
             rakuten: 4.54,
             google: 4.5,
@@ -946,7 +959,7 @@
             sightlineHtml: 'Perched high on a coastal ridge in West Izu, <strong>all 8 detached luxury suites (130㎡ / 1,400 sq.ft. each)</strong> command a sweeping ocean-and-Mt. Fuji panorama across Suruga Bay.',
             westernRoomHtml: 'All 8 suites are huge <strong>Japanese-Western Suites (和洋室)</strong> equipped with ultra-plush custom <strong>Nihon Bed</strong> twin beds facing the ocean and Mt. Fuji.',
             futonRoomHtml: 'Because every 130㎡ suite includes a tatami room alongside the twin beds, <strong>Japanese futons can be laid out on the tatami</strong> upon request.',
-            tattooDetailHtml: '<strong>Dealbreaker Check:</strong> Because Fugaku Gunjo is an intimate 8-villa clifftop retreat, <strong>there is NO communal public bath (大浴場なし)</strong> on the property. Every suite has a large private open-air onsen on its deck where tattoos are 100% fine, but if soaking in a big communal public bath is important to your group, skip #6.',
+            tattooDetailHtml: '<strong>Note on Public Baths:</strong> Because Fugaku Gunjo is an intimate 8-villa clifftop retreat, <strong>there is no communal public bath (大浴場なし)</strong> on the property. Every suite has a large private open-air onsen on its deck where tattoos are 100% fine, though guests who want to try both an in-room bath and a large communal bath should keep this in mind.',
             diningHtml: 'Serves creative "Izu French Kaiseki" (eaten with chopsticks) in private dining rooms—request a combined 6-person private dining room when booking 3 suites.',
             verdictHtml: 'Awarded <strong>1 Michelin Key (2024/2025)</strong>. Furthest drive from Mishima Station (~65–75 min down the coast) and highest price point.',
             videos: [
@@ -966,11 +979,12 @@
             waterShort: '100% Free-Flowing Milky Sulfur Onsen (大涌谷にごり湯)',
             diningShort: 'Yes — Private Dining Room (個室ダイニング)',
             tattooFriendlyPublic: false,
-            dealbreakerWarning: true,
-            dealbreakerBanner: '⚠️ PUBLIC BATH NOTE (#7): Like #6, Hakone Yuyado Zen is a 10-room boutique inn with NO communal public bath (all bathing is in your private in-room milky sulfur onsen).',
-            tattooBadge: '⚠️ NO Communal Public Bath',
-            tattooBadgeClass: 'bg-rose-100 text-rose-900 border border-rose-300',
-            tattooShort: 'No communal public bath on property (大浴場なし). All 10 rooms have private free-flowing milky Owakudani sulfur onsen baths.',
+            alertType: 'yellow',
+            dealbreakerWarning: false,
+            dealbreakerBanner: 'ℹ️ Note on Public Baths (#7): Hakone Yuyado Zen is a 10-room boutique inn with no communal public bath (大浴場なし)—all bathing is in your private in-room milky sulfur onsen (tattoos 100% OK).',
+            tattooBadge: 'ℹ️ In-Room Onsen Only (No Public Bath)',
+            tattooBadgeClass: 'bg-amber-100 text-amber-900 border border-amber-300',
+            tattooShort: 'No communal public bath on property (大浴場なし). All 10 rooms have private free-flowing milky Owakudani sulfur onsen baths (tattoos 100% OK).',
             ikkyu: 4.75,
             rakuten: 4.65,
             google: 4.3,
@@ -990,7 +1004,7 @@
             sightlineHtml: 'Almost no luxury ryokans in Hakone can see Mt. Fuji from the rooms. Perched high on a ridge in Sengokuhara, <strong>Hakone Yuyado Zen</strong> has 3 specific rooms (plus adjacent room <em>Kohaku</em>) that look over the Hakone outer rim at the upper peak of Mt. Fuji while soaking in <strong>100% free-flowing milky Owakudani volcanic sulfur water (大涌谷温泉 源泉かけ流し・にごり湯)</strong>.',
             westernRoomHtml: 'Book <strong>「つるばみ」 (Tsurubami — Room 205, 50㎡, Western Twin)</strong> and/or <strong>「しろがね」 (Shirogane — Room 105, 45㎡, Western Twin)</strong>.',
             futonRoomHtml: 'Book <strong>「しろ」 (Shiro — Room 101, 56㎡, Tatami + Twin Wa-yōshitsu)</strong> and adjacent <strong>「こはく」 (Kohaku — Room 102, 56㎡, Tatami + Twin Wa-yōshitsu)</strong>.',
-            tattooDetailHtml: 'Like Fugaku Gunjo, this 10-room boutique inn has <strong>no communal public bath (大浴場なし)</strong>—all bathing is in your private room cypress tub fed by milky Owakudani sulfur spring water.',
+            tattooDetailHtml: '<strong>Note on Public Baths:</strong> Like Fugaku Gunjo, this 10-room boutique inn has <strong>no communal public bath (大浴場なし)</strong>—all bathing is in your private room cypress tub fed by milky Owakudani sulfur spring water (tattoos 100% fine). Good to note for anyone hoping to try both an in-room bath and a large public bath.',
             diningHtml: 'Served in private dining rooms (<strong>個室ダイニング</strong>) where all 6 adults can dine together on seasonal Sousaku Kaiseki featuring Sagami Bay seafood and Ashigara Wagyu.',
             verdictHtml: 'Ideal only if you specifically want Hakone’s famous milky-white sulfur water (にごり湯). For full base-to-peak views of Mt. Fuji, Kawaguchiko (#1, #3, #4) or Suruga Bay (#2, #5) are much more dramatic.',
             videos: [
@@ -1103,7 +1117,9 @@
 
           const bounds = [[35.3606, 138.7274]];
           this.filteredRyokans.forEach(r => {
-            const bgColor = r.dealbreakerWarning ? '#E11D48' : '#047857';
+            const bgColor = r.alertType === 'red' ? '#E11D48' : (r.alertType === 'yellow' ? '#D97706' : '#047857');
+            const badgeBg = r.alertType === 'red' ? '#FFE4E6' : (r.alertType === 'yellow' ? '#FEF3C7' : '#D1FAE5');
+            const badgeColor = r.alertType === 'red' ? '#9F1239' : (r.alertType === 'yellow' ? '#92400E' : '#065F46');
             const icon = L.divIcon({
               className: '',
               html: `<div class="custom-pin" style="background:${bgColor};">${r.id}</div>`,
@@ -1118,7 +1134,7 @@
                 <div style="font-weight:800;font-size:14px;color:#0F1E36;">#${r.id}. ${r.nameEn}</div>
                 <div style="font-size:11px;color:#64748B;margin-bottom:4px;">${r.nameJp} &bull; ${r.areaBadge}</div>
                 <div style="font-weight:800;font-size:13px;color:#B45309;margin-bottom:4px;">${r.priceUsd} <span style="font-weight:500;color:#64748B;font-size:11px;">(Ikkyu ★ ${r.ikkyu})</span></div>
-                <div style="font-size:11px;padding:3px 6px;border-radius:4px;background:${r.dealbreakerWarning ? '#FFE4E6' : '#D1FAE5'};color:${r.dealbreakerWarning ? '#9F1239' : '#065F46'};font-weight:700;margin-bottom:8px;">
+                <div style="font-size:11px;padding:3px 6px;border-radius:4px;background:${badgeBg};color:${badgeColor};font-weight:700;margin-bottom:8px;">
                   ${r.tattooBadge}
                 </div>
                 <div style="display:flex;gap:6px;">
