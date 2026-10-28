@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mt. Fuji Private Onsen Ryokan Guide — May 2027 Family Trip</title>
+
+  <!-- Google Fonts: Cormorant Garamond, Noto Serif JP, Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Noto+Serif+JP:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- DaisyUI + Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Leaflet Interactive Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- GLightbox Full-Screen Photo Gallery CSS & JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+  <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            washi: {
+              50: '#FAF8F5',
+              100: '#F3EFE6',
+              200: '#E6DEC8',
+              300: '#D5C7A3',
+            },
+            ai: {
+              800: '#1B365D',
+              900: '#0F1E36',
+            },
+            hinoki: {
+              600: '#B45309',
+              700: '#92400E',
+            }
+          },
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', '"Noto Serif JP"', 'Georgia', 'serif'],
+            jp: ['"Noto Serif JP"', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #FAF8F5;
+      color: #1E293B;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .wa-card {
+      background: #FFFFFF;
+      border: 1px solid #E6DEC8;
+      box-shadow: 0 10px 30px -10px rgba(15, 30, 54, 0.07);
+    }
+    .wa-pattern {
+      background-color: #0F1E36;
+      background-image: radial-gradient(rgba(230, 222, 200, 0.12) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .custom-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 9999px;
+      font-weight: 800;
+      font-size: 14px;
+      color: #ffffff;
+      border: 3px solid #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      transition: transform 0.15s ease;
+    }
+    .custom-pin:hover {
+      transform: scale(1.18);
+    }
+    .leaflet-popup-content-wrapper {
+      border-radius: 12px;
+      padding: 2px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+    }
+    .leaflet-popup-content {
+      margin: 10px 12px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+  </style>
+</head>
+
+<body x-data="ryokanApp()" x-init="initApp()" class="min-h-screen flex flex-col">
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="sticky top-0 z-50 bg-[#0F1E36]/95 backdrop-blur-md text-washi-50 border-b border-washi-200/20 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🗻</span>
+        <div>
+          <span class="font-serif text-xl font-bold tracking-wide text-white">Japan May 2027</span>
+          <span class="hidden sm:inline-block ml-2 text-xs uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-200 border border-amber-400/30">
+            Mt. Fuji Private Onsen Dossier
+          </span>
+        </div>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-200">
+        <a href="#map-section" class="hover:text-amber-300 transition">Interactive Map</a>
+        <a href="#matrix-section" class="hover:text-amber-300 transition">Comparison Table</a>
+        <a href="#profiles-section" class="hover:text-amber-300 transition">Ryokan Profiles (7)</a>
+        <a href="#transit-section" class="hover:text-amber-300 transition">Transit &amp; Timeline</a>
+        <a href="#eliminated-section" class="hover:text-amber-300 transition text-amber-200/90">Eliminated Traps</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="https://www.google.com/maps/dir/Shuhokaku+Kogetsu,+2312+Kawaguchi,+Fujikawaguchiko/Konansou,+4020+Funatsu,+Fujikawaguchiko/Hotel+Kaneyamaen,+6283+Kamiyoshida,+Fujiyoshida/Hakone+Yuyado+Zen,+1245-96+Sengokuhara,+Hakone/Mishima+Station,+Shizuoka/Izu+Mitsuhama+Onsen+Shotokan,+7+Mito,+Numazu/Fugaku+Hanabusa,+1148-1+Kona,+Izunokuni/Fugaku+Gunjo,+2461-1+Yagisawa,+Izu/"
+           target="_blank" rel="noopener"
+           class="btn btn-xs sm:btn-sm bg-amber-600 hover:bg-amber-500 text-white border-none">
+          📍 Open All in Google Maps
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="wa-pattern text-white py-12 sm:py-16 border-b-4 border-amber-700/70">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-amber-200 text-xs font-semibold tracking-wider uppercase mb-4">
+          Verified via Official Japanese Specs (温泉表記) • Ikkyu.com • Rakuten Travel • Stay Vlogs
+        </div>
+        <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
+          Mt. Fuji Private Onsen Ryokan Guide
+        </h1>
+        <p class="mt-4 text-base sm:text-lg text-slate-200 leading-relaxed">
+          Curated for <strong class="text-amber-300">6 Adults (3 Couples / 3 Rooms)</strong> on a 1-night mid-week stopover between Tokyo and Kyoto/Osaka (<strong class="text-white">May 15–30, 2027</strong>). Every finalist is verified to have <strong class="text-amber-300">100% real natural volcanic hot spring water (天然温泉)</strong> in the private room baths, direct unobstructed Mt. Fuji views, a mix of Western beds and traditional tatami/futons, and private 6-person group Kaiseki dining.
+        </p>
+      </div>
+
+      <!-- 4 Key Requirement Pillars -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-8">
+        <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-4">
+          <div class="text-xs uppercase tracking-wider text-amber-300 font-semibold">Group &amp; Room Mix</div>
+          <div class="text-lg font-bold text-white mt-1">3 Rooms (6 Adults)</div>
+          <div class="text-xs text-slate-300 mt-0.5">1 Western Bed Room + 2 Tatami/Futon Rooms</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-4">
+          <div class="text-xs uppercase tracking-wider text-amber-300 font-semibold">In-Room Bath Water</div>
+          <div class="text-lg font-bold text-white mt-1">100% Real Onsen</div>
+          <div class="text-xs text-slate-300 mt-0.5">Zero heated tap water (沸かし湯) properties</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-4">
+          <div class="text-xs uppercase tracking-wider text-amber-300 font-semibold">Target Budget</div>
+          <div class="text-lg font-bold text-white mt-1">$450 – $1,200 USD</div>
+          <div class="text-xs text-slate-300 mt-0.5">Per room / night incl. Kaiseki dinner &amp; breakfast</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-4">
+          <div class="text-xs uppercase tracking-wider text-amber-300 font-semibold">Group Dining &amp; Tattoos</div>
+          <div class="text-lg font-bold text-white mt-1">6-Pax Private Dining</div>
+          <div class="text-xs text-slate-300 mt-0.5">+ Verified public bath tattoo policies</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-14 flex-1">
+
+    <!-- Quick Filter & Control Bar -->
+    <section class="wa-card rounded-2xl p-5 sm:p-6 bg-white sticky top-16 z-40 shadow-lg border-t-4 border-t-ai-800">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <!-- Region Filter -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Filter by Region</label>
+          <div class="flex flex-wrap gap-1.5">
+            <button @click="setRegion('all')"
+                    :class="regionFilter === 'all' ? 'bg-ai-800 text-white shadow-sm' : 'bg-washi-100 text-slate-700 hover:bg-washi-200'"
+                    class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">
+              All Options (7)
+            </button>
+            <button @click="setRegion('kawaguchiko')"
+                    :class="regionFilter === 'kawaguchiko' ? 'bg-ai-800 text-white shadow-sm' : 'bg-washi-100 text-slate-700 hover:bg-washi-200'"
+                    class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">
+              🗻 Lake Kawaguchiko / Fujiyoshida (3)
+            </button>
+            <button @click="setRegion('izu')"
+                    :class="regionFilter === 'izu' ? 'bg-ai-800 text-white shadow-sm' : 'bg-washi-100 text-slate-700 hover:bg-washi-200'"
+                    class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">
+              🌊 Suruga Bay / Izu (3)
+            </button>
+            <button @click="setRegion('hakone')"
+                    :class="regionFilter === 'hakone' ? 'bg-ai-800 text-white shadow-sm' : 'bg-washi-100 text-slate-700 hover:bg-washi-200'"
+                    class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition">
+              ♨️ Hakone (1)
+            </button>
+          </div>
+        </div>
+
+        <!-- Tattoo Policy Filter & Sort -->
+        <div class="flex flex-wrap items-end gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Tattoo / Public Bath Filter</label>
+            <button @click="toggleTattooFilter()"
+                    :class="onlyTattooPublicBath ? 'bg-emerald-700 text-white ring-2 ring-emerald-300' : 'bg-washi-100 text-slate-700 hover:bg-washi-200'"
+                    class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-2">
+              <span x-text="onlyTattooPublicBath ? '✅ Showing Only Tattoo-Friendly Public/Outdoor Baths (4)' : '♨️ Hide Properties w/ No Public Bath or Tattoo Ban'"></span>
+            </button>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Sort Order</label>
+            <select x-model="sortBy" class="select select-bordered select-sm bg-washi-50 border-washi-300 text-slate-800 font-medium text-xs sm:text-sm h-9 min-h-0">
+              <option value="rank">Recommended Rank (#1 → #7)</option>
+              <option value="priceAsc">Lowest Price First ($480 → $860+)</option>
+              <option value="ratingDesc">Highest Ikkyu Rating (4.79 → 4.57)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: Interactive Map -->
+    <section id="map-section" class="scroll-mt-36">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-4 gap-2">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-hinoki-600">Geographic Overview</span>
+          <h2 class="font-serif text-3xl font-bold text-ai-900">1. Interactive Regional Map &amp; Sightlines</h2>
+          <p class="text-sm text-slate-600 mt-1">
+            Click any numbered pin (<strong class="text-emerald-700">Green = Public/Outdoor Bath Available w/ Sticker or Free Private Bath</strong> &bull; <strong class="text-rose-700">Red = No Public Bath or Strict Public Bath Tattoo Ban</strong>) to preview the ryokan, or click <em>Locate on Map</em> on any card below.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <a href="mt_fuji_ryokans_map.jpg" class="glightbox btn btn-sm bg-washi-200 hover:bg-washi-300 text-ai-900 border-none" data-gallery="overview-map" data-glightbox="title: Regional Overview Map — Tokyo, Mt. Fuji, Mishima Shinkansen Station & Kyoto">
+            🖼️ View Illustrated Route Map
+          </a>
+          <button @click="resetMapView()" class="btn btn-sm btn-outline border-slate-300 text-slate-700 hover:bg-slate-100">
+            🔄 Reset Map Zoom
+          </button>
+        </div>
+      </div>
+
+      <div class="wa-card rounded-2xl overflow-hidden p-2 bg-white">
+        <div id="ryokan-map" class="w-full h-[460px] sm:h-[520px] rounded-xl z-10"></div>
+        <div class="px-4 py-3 bg-washi-50 border-t border-washi-200 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+          <div class="flex flex-wrap items-center gap-4">
+            <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-800">
+              <span class="w-3 h-3 rounded-full bg-emerald-600 inline-block"></span>
+              #1, #2, #4, #5: Has Public Bath (Cover Sticker OK or Free Outdoor Private Baths)
+            </span>
+            <span class="inline-flex items-center gap-1.5 font-semibold text-rose-800">
+              <span class="w-3 h-3 rounded-full bg-rose-600 inline-block"></span>
+              #6 &amp; #7: NO Communal Public Bath &nbsp;|&nbsp; #3: Tattoos Strictly Banned in Public Bath
+            </span>
+          </div>
+          <a href="https://www.google.com/maps/dir/Shuhokaku+Kogetsu,+2312+Kawaguchi,+Fujikawaguchiko/Konansou,+4020+Funatsu,+Fujikawaguchiko/Hotel+Kaneyamaen,+6283+Kamiyoshida,+Fujiyoshida/Hakone+Yuyado+Zen,+1245-96+Sengokuhara,+Hakone/Mishima+Station,+Shizuoka/Izu+Mitsuhama+Onsen+Shotokan,+7+Mito,+Numazu/Fugaku+Hanabusa,+1148-1+Kona,+Izunokuni/Fugaku+Gunjo,+2461-1+Yagisawa,+Izu/"
+             target="_blank" rel="noopener" class="font-bold text-ai-800 hover:underline">
+            Open Multi-Pin Route in Google Maps &rarr;
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Executive Comparison Matrix -->
+    <section id="matrix-section" class="scroll-mt-36">
+      <div class="mb-4">
+        <span class="text-xs font-bold uppercase tracking-widest text-hinoki-600">Side-by-Side Comparison</span>
+        <h2 class="font-serif text-3xl font-bold text-ai-900">2. Executive Comparison Matrix</h2>
+        <p class="text-sm text-slate-600 mt-1">
+          All estimated prices are in <strong>USD ($) per room, per night</strong> for 2 adults including multi-course Kaiseki dinner and breakfast.
+        </p>
+      </div>
+
+      <div class="wa-card rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="table w-full text-sm">
+            <thead>
+              <tr class="bg-ai-900 text-white text-xs uppercase tracking-wider">
+                <th class="py-4 px-4">Ryokan &amp; Region</th>
+                <th class="py-4 px-4">Qualifying Rooms &amp; Onsen Water</th>
+                <th class="py-4 px-4">Public Bath &amp; Tattoo Policy</th>
+                <th class="py-4 px-4">Verified Ratings</th>
+                <th class="py-4 px-4">Est. Price (USD) &amp; Booking</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-washi-200">
+              <template x-for="r in filteredRyokans" :key="r.id">
+                <tr :class="r.dealbreakerWarning ? 'bg-rose-50/70 hover:bg-rose-100/60' : 'hover:bg-washi-50'" class="transition">
+                  <!-- Col 1: Name & Region -->
+                  <td class="py-4 px-4 align-top min-w-[210px]">
+                    <div class="flex items-start gap-2.5">
+                      <span :class="r.dealbreakerWarning ? 'bg-rose-600' : 'bg-emerald-700'"
+                            class="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5"
+                            x-text="r.id"></span>
+                      <div>
+                        <a :href="'#ryokan-' + r.id" class="font-bold text-base text-ai-900 hover:text-amber-700 underline decoration-washi-300" x-text="r.nameEn"></a>
+                        <div class="font-jp text-xs text-slate-500 mt-0.5" x-text="r.nameJp"></div>
+                        <div class="mt-2 inline-block px-2 py-0.5 rounded text-xs font-semibold bg-washi-100 text-slate-700" x-text="r.areaBadge"></div>
+                        <div class="text-xs text-slate-500 mt-1"><strong class="text-slate-700">Sightline:</strong> <span x-text="r.viewShort"></span></div>
+                        <div class="mt-2 flex gap-2">
+                          <button @click="focusOnMap(r.id)" class="text-xs font-semibold text-ai-800 hover:text-amber-700">📍 Map Pin</button>
+                          <span class="text-slate-300">|</span>
+                          <a :href="'#ryokan-' + r.id" class="text-xs font-semibold text-ai-800 hover:text-amber-700">Photos &amp; Rooms &darr;</a>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Col 2: Rooms & Water -->
+                  <td class="py-4 px-4 align-top min-w-[230px]">
+                    <div class="font-semibold text-slate-800" x-text="r.roomsShort"></div>
+                    <div class="text-xs text-emerald-800 font-semibold mt-1" x-text="'♨️ ' + r.waterShort"></div>
+                    <div class="text-xs text-slate-600 mt-1"><strong>6-Pax Dining:</strong> <span x-text="r.diningShort"></span></div>
+                  </td>
+
+                  <!-- Col 3: Tattoo & Public Bath Policy -->
+                  <td class="py-4 px-4 align-top min-w-[240px]">
+                    <span :class="r.tattooBadgeClass" class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold mb-1.5" x-text="r.tattooBadge"></span>
+                    <p :class="r.dealbreakerWarning ? 'text-rose-900 font-semibold' : 'text-slate-700'" class="text-xs leading-relaxed" x-text="r.tattooShort"></p>
+                  </td>
+
+                  <!-- Col 4: Ratings -->
+                  <td class="py-4 px-4 align-top whitespace-nowrap">
+                    <div class="text-xs"><span class="font-semibold text-slate-500">Ikkyu:</span> <strong class="text-ai-900 text-sm" x-text="r.ikkyu"></strong></div>
+                    <div class="text-xs mt-1"><span class="font-semibold text-slate-500">Rakuten:</span> <strong class="text-slate-800" x-text="r.rakuten"></strong></div>
+                    <div class="text-xs mt-1"><span class="font-semibold text-slate-500">Google:</span> <strong class="text-slate-800" x-text="r.google"></strong></div>
+                  </td>
+
+                  <!-- Col 5: Price & Booking -->
+                  <td class="py-4 px-4 align-top whitespace-nowrap">
+                    <div class="text-base font-extrabold text-ai-900" x-text="r.priceUsd"></div>
+                    <div class="text-xs text-slate-500" x-text="r.priceJpy + ' / room'"></div>
+                    <div class="mt-2 text-xs text-slate-700">
+                      <span class="font-semibold">Opens:</span> <span x-text="r.bookingWindow"></span>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: Deep-Dive Profiles, Verified Photos & Embedded YouTube Walkthroughs -->
+    <section id="profiles-section" class="scroll-mt-36 space-y-10">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-widest text-hinoki-600">Complete Property Breakdowns</span>
+        <h2 class="font-serif text-3xl font-bold text-ai-900">3. Deep-Dive Ryokan Profiles, Photos &amp; Video Walkthroughs</h2>
+        <p class="text-sm text-slate-600 mt-1">
+          Click any photo to open the full-screen lightbox gallery, or click <strong>Watch Stay Walkthrough Video</strong> on any card to watch real guest footage inline.
+        </p>
+      </div>
+
+      <template x-for="r in filteredRyokans" :key="'card-' + r.id">
+        <article :id="'ryokan-' + r.id"
+                 :class="r.dealbreakerWarning ? 'border-2 border-rose-400' : 'border border-washi-200'"
+                 class="wa-card rounded-2xl overflow-hidden scroll-mt-36 transition">
+
+          <!-- Dealbreaker Top Banner for #6, #3, #7 -->
+          <template x-if="r.dealbreakerBanner">
+            <div class="bg-rose-700 text-white px-5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2">
+              <span x-text="r.dealbreakerBanner"></span>
+              <span class="uppercase tracking-wider text-[11px] bg-white/20 px-2 py-0.5 rounded shrink-0">Heads Up for Group</span>
+            </div>
+          </template>
+
+          <!-- Card Header -->
+          <div class="p-6 sm:p-8 bg-gradient-to-r from-washi-50 to-white border-b border-washi-200">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div>
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                  <span :class="r.dealbreakerWarning ? 'bg-rose-600' : 'bg-ai-900'"
+                        class="px-3 py-1 rounded-full text-white text-xs font-bold uppercase tracking-wider"
+                        x-text="'Option #' + r.id"></span>
+                  <span class="px-3 py-1 rounded-full bg-washi-200/80 text-ai-900 text-xs font-bold" x-text="r.areaBadge"></span>
+                  <span :class="r.tattooBadgeClass" class="px-3 py-1 rounded-full text-xs font-bold" x-text="r.tattooBadge"></span>
+                </div>
+                <h3 class="font-serif text-2xl sm:text-3xl font-bold text-ai-900">
+                  <span x-text="r.nameEn"></span>
+                  <span class="font-jp text-lg sm:text-xl font-medium text-slate-500 ml-2" x-text="'(' + r.nameJp + ')'"></span>
+                </h3>
+                <p class="text-sm font-semibold text-hinoki-600 mt-1" x-text="r.tagline"></p>
+              </div>
+
+              <!-- Price & Quick Actions Box -->
+              <div class="flex flex-wrap sm:flex-nowrap items-center gap-4 bg-white p-4 rounded-xl border border-washi-200 shadow-sm shrink-0">
+                <div>
+                  <div class="text-xs uppercase tracking-wider text-slate-400 font-bold">Est. Room Rate (2 Pax)</div>
+                  <div class="text-xl sm:text-2xl font-extrabold text-ai-900" x-text="r.priceUsd"></div>
+                  <div class="text-xs text-slate-500" x-text="r.priceJpy + ' w/ Dinner & Breakfast'"></div>
+                </div>
+                <div class="border-l border-washi-200 pl-4 space-y-1.5">
+                  <div class="text-xs font-bold text-slate-700">
+                    Ikkyu <span class="text-amber-600" x-text="'★ ' + r.ikkyu"></span> &bull; Rakuten <span x-text="r.rakuten"></span>
+                  </div>
+                  <div class="flex flex-wrap gap-1.5">
+                    <button @click="focusOnMap(r.id)" class="btn btn-xs bg-washi-100 hover:bg-washi-200 text-ai-900 border-washi-300">
+                      📍 Locate on Map
+                    </button>
+                    <a :href="r.googleMapsUrl" target="_blank" rel="noopener" class="btn btn-xs bg-washi-100 hover:bg-washi-200 text-ai-900 border-washi-300">
+                      🗺️ Google Maps
+                    </a>
+                    <a :href="r.officialUrl" target="_blank" rel="noopener" class="btn btn-xs bg-ai-800 hover:bg-ai-900 text-white border-none">
+                      🌐 Official Site &nearr;
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3-Photo Verified Visual Grid (Building Exterior | Mt. Fuji View | Guest Room) -->
+          <div class="p-6 sm:p-8 bg-white border-b border-washi-100">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <template x-for="(p, idx) in r.photos" :key="idx">
+                <a :href="p.src"
+                   class="glightbox group block rounded-xl overflow-hidden border border-washi-200 bg-washi-50 shadow-sm hover:shadow-md transition"
+                   :data-gallery="'gallery-' + r.id"
+                   :data-glightbox="'title: ' + r.nameEn + ' — ' + p.label">
+                  <div class="relative h-52 sm:h-56 overflow-hidden bg-slate-200">
+                    <img :src="p.src" :alt="r.nameEn + ' ' + p.label"
+                         class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                    <div class="absolute top-2.5 left-2.5 bg-ai-900/85 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-md">
+                      <span x-text="(idx + 1) + '. ' + p.badge"></span>
+                    </div>
+                    <div class="absolute bottom-2.5 right-2.5 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">
+                      🔍 Click to Enlarge
+                    </div>
+                  </div>
+                  <div class="px-3.5 py-2.5 text-xs font-semibold text-slate-700 flex items-center justify-between">
+                    <span x-text="p.label"></span>
+                    <span class="text-slate-400 group-hover:text-ai-800">&nearr;</span>
+                  </div>
+                </a>
+              </template>
+            </div>
+          </div>
+
+          <!-- Detailed Specs Grid -->
+          <div class="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white">
+            <!-- Left 7 Cols: Sightline & Exact Room Pairings -->
+            <div class="lg:col-span-7 space-y-4">
+              <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-hinoki-600 mb-1">Sightline &amp; Setting</h4>
+                <p class="text-sm text-slate-700 leading-relaxed" x-html="r.sightlineHtml"></p>
+              </div>
+
+              <div class="bg-washi-50 rounded-xl p-4 border border-washi-200 space-y-3">
+                <div class="text-xs font-bold uppercase tracking-wider text-ai-900">
+                  Exact 3-Room Booking Formula for Your Group (6 Adults)
+                </div>
+                <div class="flex items-start gap-2.5 text-sm">
+                  <span class="text-base shrink-0">🛏️</span>
+                  <div>
+                    <strong class="text-ai-900">1 Couple Requiring Western Beds:</strong>
+                    <div class="text-slate-700 text-xs sm:text-sm mt-0.5 leading-relaxed" x-html="r.westernRoomHtml"></div>
+                  </div>
+                </div>
+                <div class="flex items-start gap-2.5 text-sm border-t border-washi-200 pt-2.5">
+                  <span class="text-base shrink-0">🎑</span>
+                  <div>
+                    <strong class="text-ai-900">2 Couples Preferring Tatami / Futons:</strong>
+                    <div class="text-slate-700 text-xs sm:text-sm mt-0.5 leading-relaxed" x-html="r.futonRoomHtml"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right 5 Cols: Tattoo Policy, Group Dining & Reviewer Verdict -->
+            <div class="lg:col-span-5 space-y-4">
+              <!-- Tattoo & Public Bath Box -->
+              <div :class="r.dealbreakerWarning ? 'bg-rose-50 border-rose-300' : 'bg-emerald-50/70 border-emerald-200'"
+                   class="rounded-xl p-4 border">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold uppercase tracking-wider"
+                        :class="r.dealbreakerWarning ? 'text-rose-800' : 'text-emerald-900'">
+                    ♨️ Public Bath &amp; Tattoo Policy
+                  </span>
+                  <span :class="r.tattooBadgeClass" class="px-2 py-0.5 rounded text-[11px] font-bold" x-text="r.tattooBadge"></span>
+                </div>
+                <p class="text-xs sm:text-sm leading-relaxed"
+                   :class="r.dealbreakerWarning ? 'text-rose-900' : 'text-slate-700'"
+                   x-html="r.tattooDetailHtml"></p>
+              </div>
+
+              <!-- Group Dining Box -->
+              <div class="rounded-xl p-4 bg-washi-50 border border-washi-200">
+                <div class="text-xs font-bold uppercase tracking-wider text-ai-900 mb-1">🍶 6-Person Private Group Dining</div>
+                <p class="text-xs sm:text-sm text-slate-700 leading-relaxed" x-html="r.diningHtml"></p>
+              </div>
+
+              <!-- Domestic Reviewer Takeaways -->
+              <div class="rounded-xl p-4 bg-washi-50 border border-washi-200">
+                <div class="text-xs font-bold uppercase tracking-wider text-ai-900 mb-1">🇯🇵 Japanese Reviewer Verdict &amp; Booking Window</div>
+                <p class="text-xs sm:text-sm text-slate-700 leading-relaxed" x-html="r.verdictHtml"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Embedded YouTube Stay Walkthroughs Footer -->
+          <div class="px-6 sm:px-8 py-4 bg-washi-100/70 border-t border-washi-200">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2 text-xs sm:text-sm font-bold text-ai-900">
+                <span>🎬 Authentic Guest Stay Walkthrough Videos (宿泊記):</span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <template x-for="(v, vIdx) in r.videos" :key="vIdx">
+                  <button @click="toggleVideo(r.id, v.youtubeId)"
+                          :class="activeVideos[r.id] === v.youtubeId ? 'bg-rose-700 text-white' : 'bg-white text-ai-900 hover:bg-ai-800 hover:text-white border border-washi-300'"
+                          class="btn btn-xs sm:btn-sm font-semibold transition">
+                    <span x-text="activeVideos[r.id] === v.youtubeId ? '✕ Close Video Player' : '▶️ Watch: ' + v.title"></span>
+                  </button>
+                </template>
+              </div>
+            </div>
+
+            <!-- Inline Responsive YouTube Player -->
+            <template x-if="activeVideos[r.id]">
+              <div class="mt-4 rounded-xl overflow-hidden border-2 border-ai-800 bg-black shadow-xl max-w-3xl mx-auto">
+                <div class="relative pt-[56.25%]">
+                  <iframe class="absolute inset-0 w-full h-full"
+                          :src="'https://www.youtube.com/embed/' + activeVideos[r.id] + '?autoplay=1&rel=0'"
+                          title="YouTube Ryokan Stay Walkthrough"
+                          frameborder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowfullscreen></iframe>
+                </div>
+              </div>
+            </template>
+          </div>
+        </article>
+      </template>
+    </section>
+
+    <!-- SECTION 4: Transit & Routing + Booking Timeline -->
+    <section id="transit-section" class="scroll-mt-36 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="wa-card rounded-2xl p-6 sm:p-8">
+        <span class="text-xs font-bold uppercase tracking-widest text-hinoki-600">Door-to-Door Logistics</span>
+        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-ai-900 mt-1 mb-4">4. Transit &amp; Routing (Tokyo &harr; Ryokan &harr; Kyoto)</h2>
+        <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
+          <div class="p-4 rounded-xl bg-washi-50 border border-washi-200">
+            <div class="font-bold text-ai-900">🗻 Route A — Lake Kawaguchiko / Fujiyoshida (#1 Kogetsu, #3 Bessho Sasa, #4 Konansou)</div>
+            <p class="mt-1 text-xs sm:text-sm">
+              <strong>Tokyo (Shinjuku/Tokyo Stn)</strong> &rarr; <em>Highway Bus or JR Fuji Excursion Express (1 hr 45 min)</em> &rarr; <strong>Kawaguchiko / Fujisan Stn</strong> (free ryokan shuttle) &rarr; <em>Fujikyu Express Bus (1 hr 30 min)</em> &rarr; <strong>Mishima Shinkansen Stn</strong> &rarr; <em>Tokaido Shinkansen (2 hr 00 min)</em> &rarr; <strong>Kyoto / Osaka</strong>.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-washi-50 border border-washi-200">
+            <div class="font-bold text-ai-900">🚅 Route B — Suruga Bay / Izu (#2 Shotokan, #5 Fugaku Hanabusa, #6 Fugaku Gunjo)</div>
+            <p class="mt-1 text-xs sm:text-sm">
+              <strong>Tokyo Stn</strong> &rarr; <em>Tokaido Shinkansen (45 min)</em> &rarr; <strong>Mishima Stn</strong> &rarr; <em>25–30 min taxi or Izuhakone local train</em> &rarr; <strong>Ryokan</strong> &rarr; <em>Back to Mishima Stn</em> &rarr; <em>Tokaido Shinkansen (2 hr 00 min)</em> &rarr; <strong>Kyoto / Osaka</strong>.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 text-xs sm:text-sm">
+            <strong>💡 Pro-Tip (Outbound vs. Return Leg):</strong> Putting the ryokan on the <strong>return trip (Kyoto &rarr; Ryokan &rarr; Tokyo)</strong> is a huge favorite for 6-person groups: after a week of walking 20,000+ steps a day in Kyoto/Osaka, soaking in a private Mt. Fuji hot spring with a Kaiseki feast is the ultimate recovery—and you can ship your large suitcases directly from your Kyoto hotel to your final Tokyo hotel via <em>Takkyubin</em>, bringing only a light overnight bag to the ryokan.
+          </div>
+        </div>
+      </div>
+
+      <div class="wa-card rounded-2xl p-6 sm:p-8">
+        <span class="text-xs font-bold uppercase tracking-widest text-hinoki-600">When Reservations Open</span>
+        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-ai-900 mt-1 mb-4">5. Booking Action Timeline for May 15–30, 2027</h2>
+        <div class="space-y-4 text-sm text-slate-700">
+          <div class="flex gap-3 p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+            <span class="text-xl">📞</span>
+            <div>
+              <div class="font-bold text-emerald-950">Available Right Now (Up to 1 Year Ahead by Phone/Inquiry)</div>
+              <p class="text-xs sm:text-sm text-emerald-900 mt-0.5">
+                <strong>#3 Hotel Kaneyamaen / Bessho Sasa</strong> accepts phone reservations up to 1 full year in advance, and opens online bookings 6 months out.
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-3 p-4 rounded-xl bg-washi-50 border border-washi-200">
+            <span class="text-xl">🗓️</span>
+            <div>
+              <div class="font-bold text-ai-900">Early November 2026 (6 Months Out — Mark Your Calendar!)</div>
+              <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
+                Online reservation windows open for <strong>#2 Shotokan (松濤館)</strong>, <strong>#3 Bessho Sasa (別墅然然)</strong>, <strong>#4 Konansou (湖南荘)</strong>, <strong>#5 Fugaku Hanabusa (富嶽はなぶさ)</strong>, <strong>#6 Fugaku Gunjo (富岳群青)</strong>, and <strong>#7 Hakone Yuyado Zen (然)</strong>.
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-3 p-4 rounded-xl bg-washi-50 border border-washi-200">
+            <span class="text-xl">⏰</span>
+            <div>
+              <div class="font-bold text-ai-900">January / February 1, 2027 (3–4 Months Out)</div>
+              <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
+                Online bookings open for <strong>#1 Shuhokaku Kogetsu (秀峰閣 湖月)</strong>. Because Kogetsu only has 8 open-air bath rooms (plus 5 footbath rooms), book on the exact morning May 2027 dates release.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: Appendix — The "Listicle Traps" We Eliminated -->
+    <section id="eliminated-section" class="scroll-mt-36">
+      <div class="wa-card rounded-2xl p-6 sm:p-8 bg-amber-50/70 border-2 border-amber-600/40">
+        <div class="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-widest mb-1">
+          <span>⚠️ Research Methodology &amp; Disqualifications</span>
+        </div>
+        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-amber-950 mb-3">
+          6. Appendix: Popular "Listicle Traps" We Eliminated
+        </h2>
+        <p class="text-sm text-amber-900/90 mb-4">
+          Cross-referencing official Japanese room specifications (<em>客室詳細</em>) and hot spring disclosures (<em>温泉表記</em>) immediately disqualified several of the internet's most heavily promoted English-blog properties:
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-800">
+          <div class="bg-white p-4 rounded-xl border border-amber-200">
+            <strong class="text-rose-800">✕ Kozantei Ubuya (湖山亭うぶや — Lake Kawaguchiko):</strong>
+            <p class="mt-1 text-slate-600">Featured on almost every English travel blog. Official Japanese specs confirm <strong>all 20 private in-room open-air baths use heated tap/spring water (沸かし湯)—NOT natural volcanic onsen water</strong> (only the communal bath uses onsen water). (<a href="https://www.youtube.com/watch?v=3Qhk74tJCRo" target="_blank" class="underline text-ai-800 font-semibold">Watch YouTube Proof</a>).</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-amber-200">
+            <strong class="text-rose-800">✕ Hotel Green Plaza Hakone &amp; Hakone Ashinoko Hanaori (はなをり):</strong>
+            <p class="mt-1 text-slate-600">In-room open-air baths are <strong>heated tap water (沸かし湯)</strong>, dining is a noisy buffet hall, and <em>Hanaori</em> does not see Mt. Fuji from the rooms.</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-amber-200">
+            <strong class="text-rose-800">✕ Wakakusa no Yado Maruei (若草の宿 丸栄) &amp; La Vista Kawaguchiko:</strong>
+            <p class="mt-1 text-slate-600">In-room open-air baths are <strong>heated tap water (沸かし湯)</strong>; Maruei's open-air bath rooms face the lake, looking <em>away</em> from Mt. Fuji.</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-amber-200">
+            <strong class="text-rose-800">✕ Fufu Kawaguchiko (ふふ河口湖) &amp; THE KUKUNA:</strong>
+            <p class="mt-1 text-slate-600">Both have real natural onsen in the rooms, <strong>but 100% of their open-air onsen rooms are Western Twin Beds only</strong> (no tatami/futon option), and lower-floor rooms at <em>Fufu</em> have forest trees blocking the base of Mt. Fuji.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-ai-900 text-slate-400 text-xs py-8 border-t border-white/10 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <strong class="text-white">May 2027 Japan Family Trip</strong> &bull; Verified Mt. Fuji Private Onsen Ryokan Guide
+      </div>
+      <div>
+        Data cross-checked via Official Japanese Ryokan Sites, Ikkyu.com (一休.com), Rakuten Travel &amp; Google Maps
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Data & Interactive Map Logic -->
+  <script>
+    function ryokanApp() {
+      return {
+        regionFilter: 'all',
+        onlyTattooPublicBath: false,
+        sortBy: 'rank',
+        activeVideos: {},
+        map: null,
+        markers: {},
+
+        ryokans: [
+          {
+            id: 1,
+            region: 'kawaguchiko',
+            nameEn: 'Shuhokaku Kogetsu',
+            nameJp: '秀峰閣 湖月',
+            tagline: 'Best Classic Lake Kawaguchiko + Mt. Fuji Postcard View',
+            areaBadge: 'Lake Kawaguchiko North Shore',
+            viewShort: 'Fuji + Lake Reflection (Dead-Center)',
+            roomsShort: '8 Open-Air Onsen Rooms (+ 5 Footbath Onsen Rooms)',
+            waterShort: '100% Real Natural Onsen (天然温泉)',
+            diningShort: 'Yes — Dedicated Private Dining Room (個室食事処)',
+            tattooFriendlyPublic: true,
+            dealbreakerWarning: false,
+            dealbreakerBanner: '',
+            tattooBadge: 'Public Bath OK w/ Cover Sticker',
+            tattooBadgeClass: 'bg-emerald-100 text-emerald-900 border border-emerald-300',
+            tattooShort: 'Tattoos 100% fine in room bath. Public bath allows small/moderate tattoos if completely covered with waterproof cover tape/stickers.',
+            ikkyu: 4.79,
+            rakuten: 4.75,
+            google: 4.6,
+            priceMin: 560,
+            priceUsd: '$560 – $960 USD',
+            priceJpy: '¥85k – ¥145k',
+            bookingWindow: '3–4 mos out (Jan/Feb 2027)',
+            lat: 35.5230,
+            lng: 138.7667,
+            officialUrl: 'https://www.kogetu.com/',
+            googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Shuhokaku+Kogetsu+Kawaguchiko',
+            photos: [
+              { src: 'images/kogetsu_1_ext.jpg', badge: 'The Inn (Exterior)', label: 'Shuhokaku Kogetsu Building & Lakefront Garden' },
+              { src: 'images/kogetsu_2_view.jpg', badge: 'Mt. Fuji View', label: 'Unobstructed Lake Kawaguchiko & Mt. Fuji Panorama' },
+              { src: 'images/kogetsu_3_room.jpg', badge: 'Guest Room', label: 'Mt. Fuji-View Guest Room Interior' }
+            ],
+            sightlineHtml: 'Located on the quiet northern shore of Lake Kawaguchiko. There are <strong>zero power lines, buildings, or busy roads</strong> between the ryokan and the water—just the lakeside garden, Lake Kawaguchiko, and Mt. Fuji dead-center from every single room and balcony tub.',
+            westernRoomHtml: 'Book 1 of the <strong>4 Renovated 3rd-Floor Open-Air Onsen Rooms</strong> (<em>3階 露天風呂付 コーナーテラスツイン</em> [Corner Terrace Twin], <em>露天風呂付 洋室ツイン</em> [Western Twin], or <em>露天風呂付 和モダントリプル</em>) OR the 2nd-floor <em>露天風呂付 和洋特別室</em> (Tatami + Twin Beds).',
+            futonRoomHtml: 'Book 2 of the <strong>2nd-Floor Open-Air Onsen Japanese Rooms</strong> (<em>2階 露天風呂付客室 和室12畳＋土間リビング＋露天風呂・足湯付</em> — 4 rooms available).',
+            tattooDetailHtml: 'Tattoos are 100% unrestricted in your private in-room open-air onsen. In the communal lakefront baths, uncovered tattoos are prohibited, <strong>but small-to-moderate tattoos completely concealed with skin-tone waterproof cover stickers (カバーシール) are permitted</strong>.',
+            diningHtml: 'Linking 3 room reservations secures a dedicated <strong>private dining room (個室食事処)</strong> so all 6 adults dine together on seasonal Yamanashi Koshu beef &amp; Kaiseki.',
+            verdictHtml: 'Highest-rated traditional ryokan on Lake Kawaguchiko. Praised for complimentary afternoon draft beer and local wine in the lounge, piano performances, and dead-center reflections of Mt. Fuji. Opens <strong>3–4 months ahead</strong>.',
+            videos: [
+              { title: '3F Corner Terrace Onsen Room & Kaiseki Vlog', youtubeId: 'T-8fEZDZSPw' }
+            ]
+          },
+          {
+            id: 2,
+            region: 'izu',
+            nameEn: 'Izu Mitsuhama Onsen Shotokan',
+            nameJp: '伊豆・三津浜温泉 松濤館',
+            tagline: 'Best Shinkansen Access + Over-Ocean Mt. Fuji View & Same-Floor Group Layout',
+            areaBadge: 'Suruga Bay / Mito Coast (Izu)',
+            viewShort: 'Fuji Rising Over Suruga Bay Ocean',
+            roomsShort: '15 Semi-Open-Air Onsen Suites (All 21 Face Fuji)',
+            waterShort: '100% Real Natural Onsen (天然温泉)',
+            diningShort: 'Yes — Private Ryotei Dining Room (料亭個室)',
+            tattooFriendlyPublic: true,
+            dealbreakerWarning: false,
+            dealbreakerBanner: '',
+            tattooBadge: 'Public Bath OK w/ Front-Desk Sticker',
+            tattooBadgeClass: 'bg-emerald-100 text-emerald-900 border border-emerald-300',
+            tattooShort: 'Explicitly allows tattooed guests in the public baths if covered with the inn’s designated waterproof cover stickers (sold at front desk).',
+            ikkyu: 4.71,
+            rakuten: 4.68,
+            google: 4.5,
+            priceMin: 580,
+            priceUsd: '$580 – $960 USD',
+            priceJpy: '¥88k – ¥145k',
+            bookingWindow: '6 mos out (Nov 2026)',
+            lat: 35.0195,
+            lng: 138.8955,
+            officialUrl: 'https://www.shoutoukan.com/',
+            googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Izu+Mitsuhama+Onsen+Shotokan+Numazu',
+            photos: [
+              { src: 'images/shotokan_1_ext.jpg', badge: 'The Inn (Exterior)', label: 'Shotokan Entrance Facade at Dusk' },
+              { src: 'images/shotokan_2_view.jpg', badge: 'Mt. Fuji View', label: 'Mt. Fuji Across Suruga Bay from the Cypress Bath' },
+              { src: 'images/shotokan_3_room.jpg', badge: 'Guest Suite', label: 'Japanese-Western Suite w/ Twin Beds, Tatami & Fuji View' }
+            ],
+            sightlineHtml: 'Built directly on the water’s edge of Mito Bay (25–30 min from Mishima Shinkansen Station). All 21 rooms look straight across the calm blue waters of Suruga Bay and Awashima Island toward an unobstructed panorama of Mt. Fuji rising behind the ocean.',
+            westernRoomHtml: 'Book <strong>半露天風呂付和洋室「花・海」 ("Hana / Umi" — 63㎡, 6 rooms available)</strong> featuring a 12-mat tatami living space + separate bedroom with Simmons twin beds, OR <strong>半露天風呂付特別室「月」 (Corner Suite "Tsuki" — 90㎡, 3 rooms)</strong>.',
+            futonRoomHtml: 'Book 2 rooms of <strong>半露天風呂付和室12畳「見」 ("Mi" — 63㎡, 3 rooms)</strong> or <strong>半露天風呂付和室10畳「風」 ("Kaze" — 50㎡, 3 rooms)</strong>—pure tatami rooms with futons. <em>Bonus: Floors 3, 4, and 5 each have 1 of each room type so all 3 couples can stay on the exact same floor!</em>',
+            tattooDetailHtml: 'Explicitly permits tattooed guests in the communal public baths <strong>provided the tattoo can be completely covered using the inn’s designated waterproof cover stickers (当館指定の有料カバーシール)</strong> available at the front desk. Uncovered tattoos are 100% fine in your in-room cypress bath.',
+            diningHtml: 'Served in private <em>Ryotei</em> dining rooms (<strong>料亭個室食事処</strong>) seating all 6 adults together for Suruga Bay luxury seafood (spiny lobster, abalone, kinmedai) &amp; Wagyu Kaiseki.',
+            verdictHtml: 'Beloved by Japanese repeat guests for impeccable hospitality, dramatic ocean-and-Fuji views, and easy Shinkansen logistics via Mishima Station. Opens <strong>6 months ahead (November 2026)</strong>.',
+            videos: [
+              { title: 'Corner Suite "Tsuki" (月), Bath & Kaiseki', youtubeId: '41u0FQKJxh0' },
+              { title: 'Full Property & Over-Ocean Fuji Bath Tour', youtubeId: 'bfQTkq9TtZU' }
+            ]
+          },
+          {
+            id: 3,
+            region: 'kawaguchiko',
+            nameEn: 'Hotel Kaneyamaen / Bessho Sasa',
+            nameJp: '富士山温泉 ホテル鐘山苑 別墅然然',
+            tagline: 'Best Resort Amenities, High-Alkaline pH 10.3 Onsen & Easiest Advance Booking',
+            areaBadge: 'Fujiyoshida Foothills (~15m to Lake)',
+            viewShort: 'Sweeping Full-Slope Mt. Fuji Over 20,000-Tsubo Garden',
+            roomsShort: '17 Club Suites in Sasa (+ 20+ in Sanri / Yuraku)',
+            waterShort: '100% Real Natural Onsen (pH 10.3)',
+            diningShort: 'Yes — Private Ryotei (Request ≥3 days prior)',
+            tattooFriendlyPublic: false,
+            dealbreakerWarning: true,
+            dealbreakerBanner: '⚠️ PUBLIC BATH TATTOO BAN: Tattoos are strictly prohibited in Kaneyamaen’s communal & 10th-floor rooftop public baths (in-room private onsen bath or paid private family bath only).',
+            tattooBadge: '⚠️ No Tattoos in Public Bath',
+            tattooBadgeClass: 'bg-rose-100 text-rose-900 border border-rose-300',
+            tattooShort: 'Strictly prohibits all tattoos in the communal & 10F rooftop public baths. Tattooed guests bathe in their private in-room open-air onsen (or paid private bath).',
+            ikkyu: 4.72,
+            rakuten: 4.70,
+            google: 4.6,
+            priceMin: 700,
+            priceUsd: '$700 – $1,150 USD',
+            priceJpy: '¥105k – ¥175k',
+            bookingWindow: '6 mos online / 1 yr by phone',
+            lat: 35.4608,
+            lng: 138.8211,
+            officialUrl: 'https://www.bessho-sasa.com/',
+            googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Hotel+Kaneyamaen+Bessho+Sasa+Fujiyoshida',
+            photos: [
+              { src: 'images/kaneyamaen_1_ext.jpg', badge: 'The Inn (Exterior)', label: 'Hotel Kaneyamaen Building, Japanese Garden & Mt. Fuji' },
+              { src: 'images/kaneyamaen_2_view.png', badge: 'Mt. Fuji View', label: 'Panoramic Mt. Fuji View from the Onsen' },
+              { src: 'images/kaneyamaen_3_room.png', badge: 'Guest Suite', label: 'Tatami Suite w/ Kotatsu & Private Open-Air Onsen Bath' }
+            ],
+            sightlineHtml: 'Overlooks a vast 20,000-<em>tsubo</em> traditional Japanese garden with a massive, unobstructed view of Mt. Fuji’s sweeping lower slopes all the way to the peak. <em>Bessho Sasa</em> is the exclusive 17-suite executive club floor (4F/5F) where every single room has a private natural onsen open-air bath facing Mt. Fuji.',
+            westernRoomHtml: 'Book 1 <strong>瑞穂 (Mizuho — 60㎡, 9 rooms available, Western Twin beds)</strong> on the <em>Bessho Sasa</em> club floor.',
+            futonRoomHtml: 'Book 2 <strong>福地 (Fukuchi — 67–85㎡, 6 rooms, Wa-yōshitsu with both 2 Simmons beds AND a tatami room for futons)</strong> OR book 2 pure tatami rooms in <strong>ゆらく山彦亭 — 話楽 (Waraku) / 湯話 (Yubanashi)</strong> (12.5-mat pure tatami + Airweave futons + Mt. Fuji open-air onsen bath).',
+            tattooDetailHtml: '<strong>Strict Communal Bath Policy:</strong> Kaneyamaen explicitly states that guests with tattoos are not permitted in the communal public baths (including the 10th-floor rooftop bath <em>Rotenburo Fujisan</em>). Tattooed guests must use their private suite open-air bath or book the paid private family bath (<em>貸切風呂 あかね</em>).',
+            diningHtml: '<strong>Important Rule:</strong> Request at least 3 days in advance to dine together as 6 adults in a private dining room (<strong>個室料亭</strong>) rather than split across in-room dining tables.',
+            verdictHtml: 'Opens <strong>6 months ahead online (November 2026)</strong> and <strong>1 full year ahead by phone right now</strong>. Includes private Sasa Lounge (free wine/beer/sweets), garden matcha tea house, and nightly Taiko drum show.',
+            videos: [
+              { title: '"Fukuchi" (福地) Wa-yōshitsu Suite & Fuji Bath', youtubeId: 'pzSEGRR_I7I' },
+              { title: 'Club Lounge, Room, Onsen & Kaiseki Vlog', youtubeId: 'J1RyQeCdTks' }
+            ]
+          },
+          {
+            id: 4,
+            region: 'kawaguchiko',
+            nameEn: 'Fuji Kawaguchiko Onsen Konansou',
+            nameJp: '富士河口湖温泉 湖南荘',
+            tagline: 'Best Walkable Kawaguchiko Option with Classic Tatami + Western Bed Mix',
+            areaBadge: 'Lake Kawaguchiko Central (Walkable)',
+            viewShort: 'Massive Full-Mountain View (Must Book Mt. Fuji-Side)',
+            roomsShort: '~11 Mt. Fuji-Side Open-Air Onsen Rooms',
+            waterShort: '100% Real Natural Onsen (天然温泉)',
+            diningShort: 'Yes — Private Ryotei Dining Room (料亭個室)',
+            tattooFriendlyPublic: true,
+            dealbreakerWarning: false,
+            dealbreakerBanner: '',
+            tattooBadge: 'Has Private Family Baths + Rooftop Footbath',
+            tattooBadgeClass: 'bg-amber-100 text-amber-900 border border-amber-300',
+            tattooShort: 'Exposed tattoos restricted in main public bath, but offers paid private reservable baths (貸切風呂) + 100% private in-room onsen.',
+            ikkyu: 4.57,
+            rakuten: 4.70,
+            google: 4.5,
+            priceMin: 530,
+            priceUsd: '$530 – $930 USD',
+            priceJpy: '¥80k – ¥140k',
+            bookingWindow: '5–6 mos out (Nov/Dec 2026)',
+            lat: 35.5034,
+            lng: 138.7702,
+            officialUrl: 'https://www.konansou.com/',
+            googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Fuji+Kawaguchiko+Onsen+Konansou',
+            photos: [
+              { src: 'images/konansou_1_ext.jpg', badge: 'The Inn (Exterior)', label: 'Konansou Traditional Japanese Entrance Facade' },
+              { src: 'images/konansou_2_view.jpg', badge: 'Mt. Fuji View', label: 'Unobstructed Mt. Fuji View from Konansou' },
+              { src: 'images/konansou_3_room.jpg', badge: 'Guest Room', label: 'Mt. Fuji-Side Tatami Guest Room w/ Picture Window' }
+            ],
+            sightlineHtml: '<strong>Crucial Booking Rule:</strong> Konansou has Lake-side rooms (河口湖側) and Mt. Fuji-side rooms (富士山側). You <strong>must book Mt. Fuji-side (富士山側) rooms</strong>! All ~11 Mt. Fuji-side open-air onsen rooms have huge views of Mt. Fuji right from the private wooden bath tub, plus access to the 360-degree rooftop footbath deck.',
+            westernRoomHtml: 'Book <strong>【富士山側】露天風呂付和洋特別室 [Type D (80㎡) or Type E DX (102㎡)]</strong> (Simmons Twin beds + large tatami room + natural onsen open-air bath facing Mt. Fuji).',
+            futonRoomHtml: 'Book 2 rooms of <strong>【富士山側】露天風呂付和室 (12.5畳 [60㎡] or 12畳 [47㎡])</strong> (pure Japanese tatami rooms with futons + natural onsen open-air bath facing Mt. Fuji).',
+            tattooDetailHtml: 'Large/uncovered tattoos are restricted in the communal baths, but in addition to your private in-room open-air bath, Konansou has <strong>reservable private family baths (貸切風呂)</strong> where tattoos are completely fine, plus the panoramic rooftop footbath deck.',
+            diningHtml: 'Features dedicated private <em>Ryotei</em> dining rooms (<strong>料亭個室</strong>) built specifically for multi-room family/group Kaiseki dinners.',
+            verdictHtml: 'Only a 10-minute walk from Kawaguchiko Station and the lakeside boat pier. High room inventory makes securing 3 Mt. Fuji-side rooms on the same night much easier than smaller boutique inns.',
+            videos: [
+              { title: 'Mt. Fuji-Side Open-Air Onsen Room & Rooftop Footbath', youtubeId: 'zPdK5KWJ878' },
+              { title: 'Open-Air Bath & Group Dining Walkthrough', youtubeId: '78P5rclOeV0' }
+            ]
+          },
+          {
+            id: 5,
+            region: 'izu',
+            nameEn: 'Izunagaoka Onsen Fugaku Hanabusa',
+            nameJp: '伊豆長岡温泉 富嶽はなぶさ',
+            tagline: 'Best 100% Free-Flowing Onsen (源泉かけ流し), Most Tattoo-Friendly & Culinary Focus',
+            areaBadge: 'Central Izu / Kano River (~25m to Mishima)',
+            viewShort: 'Mt. Fuji Framed North Over the Kano River Valley',
+            roomsShort: '6+ Open-Air / Semi-Open-Air Onsen Rooms',
+            waterShort: '100% Free-Flowing Natural Onsen (源泉かけ流し)',
+            diningShort: 'Yes — 100% Private Dining Rooms (完全個室食事処)',
+            tattooFriendlyPublic: true,
+            dealbreakerWarning: false,
+            dealbreakerBanner: '',
+            tattooBadge: '★ Most Tattoo-Friendly (3 Free Private Outdoor Baths)',
+            tattooBadgeClass: 'bg-emerald-100 text-emerald-900 border border-emerald-300',
+            tattooShort: 'Has 3 large FREE outdoor private baths (貸切露天風呂, no reservation needed) where tattoos are 100% OK + tattoo-tolerant communal bath.',
+            ikkyu: 4.69,
+            rakuten: 4.64,
+            google: 4.2,
+            priceMin: 480,
+            priceUsd: '$480 – $830 USD',
+            priceJpy: '¥72k – ¥125k',
+            bookingWindow: '6 mos out (Nov 2026)',
+            lat: 35.0338,
+            lng: 138.9403,
+            officialUrl: 'https://yadohanabusa.com/',
+            googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Fugaku+Hanabusa+Izunagaoka',
+            photos: [
+              { src: 'images/hanabusa_1_ext.jpg', badge: 'The Inn (Exterior)', label: 'Fugaku Hanabusa Multi-Story Ryokan Facade' },
+              { src: 'images/hanabusa_2_view.jpg', badge: 'Mt. Fuji View', label: 'Open-Air Wooden Deck Bath Looking Toward Mt. Fuji' },
+              { src: 'images/hanabusa_3_room.jpg', badge: 'Guest Suite', label: 'Renovated Guest Suite w/ Twin Beds & Lounge' }
+            ],
+            sightlineHtml: 'Situated along the Kano River with all 24 rooms facing north toward Mt. Fuji. Every open-air room bath uses <strong>100% pure free-flowing natural spring water (天然温泉100% 源泉かけ流し)</strong>—never recirculated or chlorinated.',
+            westernRoomHtml: 'Book <strong>ラグジュアリーツイン露天風呂付き客室</strong> (Luxury Twin w/ Open-Air Onsen, 46㎡) or the newly renovated Feb 2025 <strong>エグゼクティブ半露天風呂付き客室 (60㎡, Simmons Twin Beds)</strong>.',
+            futonRoomHtml: 'Book <strong>デラックス露天風呂付き客室 (77㎡ — 14-mat tatami room for futons + low twin beds)</strong> and/or <strong>スタンダード露天風呂付き和室 (10-mat pure tatami room with futons + open-air onsen)</strong>.',
+            tattooDetailHtml: '<strong>Best Setup for Tattooed Guests:</strong> In addition to your private in-room free-flowing bath, the 3rd floor features <strong>3 large outdoor private baths (貸切露天風呂: <em>Saiten</em>, <em>Saiun</em>, <em>Saigetsu</em>) that are 100% FREE to use anytime without a reservation</strong> (simply check the vacancy light and lock the door). The inn is also well known for a relaxed, tattoo-tolerant policy in its communal baths.',
+            diningHtml: '100% of dinners and breakfasts are served in <strong>completely private dining rooms (完全個室食事処)</strong> seating all 6 adults together. Famous for Shizuoka A5 Wagyu aburi sushi/steak and braised Kinmedai.',
+            verdictHtml: 'Best value on the list ($480–$830/room) with true free-flowing spring water and chef-driven cuisine. Only 25 minutes from Mishima Shinkansen Station.',
+            videos: [
+              { title: 'Renovated 46㎡ Mt. Fuji Open-Air Onsen Room Tour', youtubeId: 'qZ-a_g7atDs' },
+              { title: 'Guest Stay Vlog, Free-Flowing Bath & Kaiseki', youtubeId: 'A3b9SQAidmk' }
+            ]
+          },
+          {
+            id: 6,
+            region: 'izu',
+            nameEn: 'Fugaku Gunjo',
+            nameJp: '世界遺産 富士山を望む宿 富岳群青',
+            tagline: 'Ultra-Luxury 8-Suite Clifftop Retreat (1 Michelin Key) — Private Suite Baths Only',
+            areaBadge: 'West Izu Clifftop (Toi)',
+            viewShort: 'Dramatic Clifftop Panorama of Fuji Over Suruga Bay',
+            roomsShort: 'All 8 Detached Luxury Suites (130㎡ Each)',
+            waterShort: '100% Real Natural Onsen (天然温泉)',
+            diningShort: 'Yes — Private Dining (Request 6-pax setup at booking)',
+            tattooFriendlyPublic: false,
+            dealbreakerWarning: true,
+            dealbreakerBanner: '⚠️ POTENTIAL DEALBREAKER (#6): Fugaku Gunjo does NOT have a communal public bath (大浴場なし). All bathing is 100% in your private suite open-air bath.',
+            tattooBadge: '⚠️ NO Communal Public Bath',
+            tattooBadgeClass: 'bg-rose-100 text-rose-900 border border-rose-300',
+            tattooShort: 'No communal public bath on property (大浴場なし). 100% of bathing is in your massive 130㎡ suite’s private open-air deck bath.',
+            ikkyu: 4.64,
+            rakuten: 4.54,
+            google: 4.5,
+            priceMin: 860,
+            priceUsd: '$860 – $1,220 USD',
+            priceJpy: '¥130k – ¥185k',
+            bookingWindow: '6 mos out (Nov 2026)',
+            lat: 34.9221,
+            lng: 138.7918,
+            officialUrl: 'https://www.fugakugunjo.jp/',
+            googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Fugaku+Gunjo+Toi+Izu',
+            photos: [
+              { src: 'images/gunjo_1_ext.jpg', badge: 'The Inn (Exterior)', label: 'Fugaku Gunjo Detached Villa Suite Exterior & Water Terrace' },
+              { src: 'images/gunjo_2_view.jpg', badge: 'Mt. Fuji View', label: 'Daytime View of Mt. Fuji Across Suruga Bay from Suite Deck' },
+              { src: 'images/gunjo_3_room.jpg', badge: 'Guest Suite', label: '130㎡ Suite Living Room Looking Out at Private Bath & Fuji' }
+            ],
+            sightlineHtml: 'Perched high on a coastal ridge in West Izu, <strong>all 8 detached luxury suites (130㎡ / 1,400 sq.ft. each)</strong> command a sweeping ocean-and-Mt. Fuji panorama across Suruga Bay.',
+            westernRoomHtml: 'All 8 suites are huge <strong>Japanese-Western Suites (和洋室)</strong> equipped with ultra-plush custom <strong>Nihon Bed</strong> twin beds facing the ocean and Mt. Fuji.',
+            futonRoomHtml: 'Because every 130㎡ suite includes a tatami room alongside the twin beds, <strong>Japanese futons can be laid out on the tatami</strong> upon request.',
+            tattooDetailHtml: '<strong>Dealbreaker Check:</strong> Because Fugaku Gunjo is an intimate 8-villa clifftop retreat, <strong>there is NO communal public bath (大浴場なし)</strong> on the property. Every suite has a large private open-air onsen on its deck where tattoos are 100% fine, but if soaking in a big communal public bath is important to your group, skip #6.',
+            diningHtml: 'Serves creative "Izu French Kaiseki" (eaten with chopsticks) in private dining rooms—request a combined 6-person private dining room when booking 3 suites.',
+            verdictHtml: 'Awarded <strong>1 Michelin Key (2024/2025)</strong>. Furthest drive from Mishima Station (~65–75 min down the coast) and highest price point.',
+            videos: [
+              { title: '130㎡ Suite, Open-Air Bath & French Kaiseki Vlog', youtubeId: 'WuOpvRMBfQ4' },
+              { title: 'Suite & Over-Ocean Fuji Bath Tour', youtubeId: 'QoDblR6KOJE' }
+            ]
+          },
+          {
+            id: 7,
+            region: 'hakone',
+            nameEn: 'Hakone Yuyado Zen (-ZEN-)',
+            nameJp: '箱根湯宿 然 -ZEN-',
+            tagline: 'Rare Hakone Boutique Inn with Direct Mt. Fuji Peak Views & Milky Sulfur Onsen',
+            areaBadge: 'Hakone (Sengokuhara High Ridge)',
+            viewShort: 'Upper Peak of Mt. Fuji Over Hakone Outer Rim',
+            roomsShort: '3–4 Fuji-View Rooms Out of 10 Total Rooms',
+            waterShort: '100% Free-Flowing Milky Sulfur Onsen (大涌谷にごり湯)',
+            diningShort: 'Yes — Private Dining Room (個室ダイニング)',
+            tattooFriendlyPublic: false,
+            dealbreakerWarning: true,
+            dealbreakerBanner: '⚠️ PUBLIC BATH NOTE (#7): Like #6, Hakone Yuyado Zen is a 10-room boutique inn with NO communal public bath (all bathing is in your private in-room milky sulfur onsen).',
+            tattooBadge: '⚠️ NO Communal Public Bath',
+            tattooBadgeClass: 'bg-rose-100 text-rose-900 border border-rose-300',
+            tattooShort: 'No communal public bath on property (大浴場なし). All 10 rooms have private free-flowing milky Owakudani sulfur onsen baths.',
+            ikkyu: 4.75,
+            rakuten: 4.65,
+            google: 4.3,
+            priceMin: 560,
+            priceUsd: '$560 – $860 USD',
+            priceJpy: '¥85k – ¥130k',
+            bookingWindow: '6 mos out (Nov 2026)',
+            lat: 35.2570,
+            lng: 139.0006,
+            officialUrl: 'https://www.hakone-zen.com/',
+            googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Hakone+Yuyado+Zen+Sengokuhara',
+            photos: [
+              { src: 'images/zen_1_ext.jpg', badge: 'The Inn (Exterior)', label: 'Hakone Yuyado Zen Building Exterior on Sengokuhara Hillside' },
+              { src: 'images/zen_2_view.jpg', badge: 'Mt. Fuji View', label: 'Mt. Fuji Peak Rising Above the Hakone Outer Rim Ridge' },
+              { src: 'images/zen_3_room.jpg', badge: 'Guest Room', label: 'Wa-yōshitsu Guest Room & Private Cypress Onsen Bath' }
+            ],
+            sightlineHtml: 'Almost no luxury ryokans in Hakone can see Mt. Fuji from the rooms. Perched high on a ridge in Sengokuhara, <strong>Hakone Yuyado Zen</strong> has 3 specific rooms (plus adjacent room <em>Kohaku</em>) that look over the Hakone outer rim at the upper peak of Mt. Fuji while soaking in <strong>100% free-flowing milky Owakudani volcanic sulfur water (大涌谷温泉 源泉かけ流し・にごり湯)</strong>.',
+            westernRoomHtml: 'Book <strong>「つるばみ」 (Tsurubami — Room 205, 50㎡, Western Twin)</strong> and/or <strong>「しろがね」 (Shirogane — Room 105, 45㎡, Western Twin)</strong>.',
+            futonRoomHtml: 'Book <strong>「しろ」 (Shiro — Room 101, 56㎡, Tatami + Twin Wa-yōshitsu)</strong> and adjacent <strong>「こはく」 (Kohaku — Room 102, 56㎡, Tatami + Twin Wa-yōshitsu)</strong>.',
+            tattooDetailHtml: 'Like Fugaku Gunjo, this 10-room boutique inn has <strong>no communal public bath (大浴場なし)</strong>—all bathing is in your private room cypress tub fed by milky Owakudani sulfur spring water.',
+            diningHtml: 'Served in private dining rooms (<strong>個室ダイニング</strong>) where all 6 adults can dine together on seasonal Sousaku Kaiseki featuring Sagami Bay seafood and Ashigara Wagyu.',
+            verdictHtml: 'Ideal only if you specifically want Hakone’s famous milky-white sulfur water (にごり湯). For full base-to-peak views of Mt. Fuji, Kawaguchiko (#1, #3, #4) or Suruga Bay (#2, #5) are much more dramatic.',
+            videos: [
+              { title: 'Milky Onsen Bath, Mt. Fuji View & Kaiseki Vlog', youtubeId: 'yPOOJBzv334' },
+              { title: 'Room & Dining Walkthrough', youtubeId: 'sFYFt-CksqM' }
+            ]
+          }
+        ],
+
+        get filteredRyokans() {
+          let list = this.ryokans.filter(r => {
+            if (this.regionFilter !== 'all' && r.region !== this.regionFilter) return false;
+            if (this.onlyTattooPublicBath && !r.tattooFriendlyPublic) return false;
+            return true;
+          });
+          if (this.sortBy === 'priceAsc') {
+            list.sort((a, b) => a.priceMin - b.priceMin);
+          } else if (this.sortBy === 'ratingDesc') {
+            list.sort((a, b) => b.ikkyu - a.ikkyu);
+          } else {
+            list.sort((a, b) => a.id - b.id);
+          }
+          return list;
+        },
+
+        setRegion(reg) {
+          this.regionFilter = reg;
+          this.updateMapMarkers();
+        },
+
+        toggleTattooFilter() {
+          this.onlyTattooPublicBath = !this.onlyTattooPublicBath;
+          this.updateMapMarkers();
+        },
+
+        toggleVideo(ryokanId, youtubeId) {
+          if (this.activeVideos[ryokanId] === youtubeId) {
+            delete this.activeVideos[ryokanId];
+            this.activeVideos = { ...this.activeVideos };
+          } else {
+            this.activeVideos = { ...this.activeVideos, [ryokanId]: youtubeId };
+          }
+        },
+
+        initApp() {
+          this.$nextTick(() => {
+            this.initLeafletMap();
+            GLightbox({ selector: '.glightbox', touchNavigation: true, loop: true });
+          });
+        },
+
+        initLeafletMap() {
+          this.map = L.map('ryokan-map', {
+            center: [35.24, 138.85],
+            zoom: 10,
+            scrollWheelZoom: false
+          });
+
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 18
+          }).addTo(this.map);
+
+          // Add Mt. Fuji Summit Landmark Pin
+          const fujiIcon = L.divIcon({
+            className: '',
+            html: `<div style="background:#1B365D;color:#fff;padding:4px 10px;border-radius:999px;font-weight:800;font-size:12px;border:2px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.35);white-space:nowrap;">🗻 Mt. Fuji (3,776m)</div>`,
+            iconSize: [140, 28],
+            iconAnchor: [70, 14]
+          });
+          L.marker([35.3606, 138.7274], { icon: fujiIcon })
+            .addTo(this.map)
+            .bindPopup(`<strong>🗻 Mount Fuji Summit (3,776m)</strong><br><span style="font-size:12px;color:#475569;">All 7 ryokans on this map have verified direct views of Mt. Fuji from their guest rooms and private onsen baths.</span>`);
+
+          // Add Mishima Shinkansen Station Pin
+          const mishimaIcon = L.divIcon({
+            className: '',
+            html: `<div style="background:#0F766E;color:#fff;padding:3px 8px;border-radius:6px;font-weight:700;font-size:11px;border:2px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,0.3);white-space:nowrap;">🚅 Mishima Shinkansen Stn</div>`,
+            iconSize: [155, 24],
+            iconAnchor: [77, 12]
+          });
+          L.marker([35.1265, 138.9110], { icon: mishimaIcon })
+            .addTo(this.map)
+            .bindPopup(`<strong>🚅 Mishima Shinkansen Station</strong><br><span style="font-size:12px;color:#475569;">45 min from Tokyo Station &bull; 2 hr to Kyoto Station on the Tokaido Shinkansen. Gateway to #2 Shotokan &amp; #5 Fugaku Hanabusa (25 min), and 90-min express bus to Lake Kawaguchiko.</span>`);
+
+          this.updateMapMarkers();
+        },
+
+        updateMapMarkers() {
+          if (!this.map) return;
+          Object.values(this.markers).forEach(m => this.map.removeLayer(m));
+          this.markers = {};
+
+          const bounds = [[35.3606, 138.7274]];
+          this.filteredRyokans.forEach(r => {
+            const bgColor = r.dealbreakerWarning ? '#E11D48' : '#047857';
+            const icon = L.divIcon({
+              className: '',
+              html: `<div class="custom-pin" style="background:${bgColor};">${r.id}</div>`,
+              iconSize: [34, 34],
+              iconAnchor: [17, 17],
+              popupAnchor: [0, -18]
+            });
+
+            const popupHtml = `
+              <div style="width:230px;">
+                <img src="${r.photos[0].src}" style="width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:6px;" />
+                <div style="font-weight:800;font-size:14px;color:#0F1E36;">#${r.id}. ${r.nameEn}</div>
+                <div style="font-size:11px;color:#64748B;margin-bottom:4px;">${r.nameJp} &bull; ${r.areaBadge}</div>
+                <div style="font-weight:800;font-size:13px;color:#B45309;margin-bottom:4px;">${r.priceUsd} <span style="font-weight:500;color:#64748B;font-size:11px;">(Ikkyu ★ ${r.ikkyu})</span></div>
+                <div style="font-size:11px;padding:3px 6px;border-radius:4px;background:${r.dealbreakerWarning ? '#FFE4E6' : '#D1FAE5'};color:${r.dealbreakerWarning ? '#9F1239' : '#065F46'};font-weight:700;margin-bottom:8px;">
+                  ${r.tattooBadge}
+                </div>
+                <div style="display:flex;gap:6px;">
+                  <a href="#ryokan-${r.id}" style="flex:1;text-align:center;background:#1B365D;color:#fff;text-decoration:none;padding:5px 8px;border-radius:6px;font-size:11px;font-weight:700;">View Profile &darr;</a>
+                  <a href="${r.googleMapsUrl}" target="_blank" style="flex:1;text-align:center;background:#F1F5F9;color:#0F1E36;text-decoration:none;padding:5px 8px;border-radius:6px;font-size:11px;font-weight:700;border:1px solid #CBD5E1;">Google Maps &nearr;</a>
+                </div>
+              </div>
+            `;
+
+            const marker = L.marker([r.lat, r.lng], { icon }).addTo(this.map).bindPopup(popupHtml);
+            this.markers[r.id] = marker;
+            bounds.push([r.lat, r.lng]);
+          });
+
+          if (bounds.length > 1) {
+            this.map.fitBounds(bounds, { padding: [45, 45], maxZoom: 12 });
+          }
+        },
+
+        focusOnMap(id) {
+          const el = document.getElementById('map-section');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+          const r = this.ryokans.find(x => x.id === id);
+          if (r && this.map && this.markers[id]) {
+            setTimeout(() => {
+              this.map.flyTo([r.lat, r.lng], 13, { duration: 0.8 });
+              this.markers[id].openPopup();
+            }, 350);
+          }
+        },
+
+        resetMapView() {
+          this.updateMapMarkers();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
