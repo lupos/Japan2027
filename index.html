@@ -284,7 +284,7 @@
 
             <div>
               <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Sort By</label>
-              <select x-model="sortBy" class="select select-bordered select-sm bg-washi-50 border-washi-300 text-slate-800 font-medium text-xs h-8 min-h-0">
+              <select x-model="sortBy" @change="syncUrlParams()" class="select select-bordered select-sm bg-washi-50 border-washi-300 text-slate-800 font-medium text-xs h-8 min-h-0">
                 <option value="rank">Recommended Rank (#1 → #7)</option>
                 <option value="priceAsc">Lowest Price ($480 → $860+)</option>
                 <option value="ratingDesc">Highest Rating (4.79 → 4.57)</option>
@@ -292,7 +292,11 @@
             </div>
 
             <div class="flex items-center gap-1.5">
-              <button @click="regionFilter = 'all'; onlyTattooPublicBath = false; sortBy = 'rank'; updateMapMarkers();"
+              <button @click="copyShareUrl()"
+                      class="btn btn-xs bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 h-8 px-2.5 font-semibold">
+                <span x-text="linkCopied ? '✅ URL Copied!' : '🔗 Copy Filtered URL'"></span>
+              </button>
+              <button @click="resetFilters()"
                       class="btn btn-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300 h-8 px-2.5">
                 Reset
               </button>
@@ -408,38 +412,56 @@
 
     <!-- SECTION 2: Ryokan Shortlist (Switchable between Visual Cards & Compact Table) -->
     <section id="listings-section" class="scroll-mt-16 space-y-5">
-      <!-- Toolbar: View Mode Toggle + Expand/Collapse All -->
-      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-washi-200 pb-3">
+      <!-- Header & Dedicated Second-Line Controls Toolbar (No Layout Shifts) -->
+      <div class="flex flex-col gap-3 border-b border-washi-200 pb-4">
         <div>
           <h2 class="font-serif text-2xl sm:text-3xl font-bold text-ai-900">
             The 7 Verified Ryokans
           </h2>
-          <p class="text-xs sm:text-sm text-slate-600">
+          <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
             Prices are <strong>USD ($) per room/night</strong> (2 adults, Kaiseki dinner &amp; breakfast included). YouTube links open directly in a new tab.
           </p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2">
-          <!-- View Switcher: Cards vs Table -->
-          <div class="inline-flex rounded-lg bg-washi-200/70 p-1">
-            <button @click="viewMode = 'cards'"
-                    :class="viewMode === 'cards' ? 'bg-ai-900 text-white shadow-sm' : 'text-slate-700 hover:text-ai-900'"
-                    class="px-3 py-1 rounded-md text-xs font-bold transition">
-              📇 Visual Cards
-            </button>
-            <button @click="viewMode = 'table'"
-                    :class="viewMode === 'table' ? 'bg-ai-900 text-white shadow-sm' : 'text-slate-700 hover:text-ai-900'"
-                    class="px-3 py-1 rounded-md text-xs font-bold transition">
-              📊 Side-by-Side Table
+        <!-- Separate Line for View Toggle + Expand All + Active Filter Status -->
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- View Switcher: Cards vs Table -->
+            <div class="inline-flex rounded-lg bg-washi-200/70 p-1">
+              <button @click="setViewMode('cards')"
+                      :class="viewMode === 'cards' ? 'bg-ai-900 text-white shadow-sm' : 'text-slate-700 hover:text-ai-900'"
+                      class="px-3 py-1 rounded-md text-xs font-bold transition">
+                📇 Visual Cards
+              </button>
+              <button @click="setViewMode('table')"
+                      :class="viewMode === 'table' ? 'bg-ai-900 text-white shadow-sm' : 'text-slate-700 hover:text-ai-900'"
+                      class="px-3 py-1 rounded-md text-xs font-bold transition">
+                📊 Side-by-Side Table
+              </button>
+            </div>
+
+            <!-- Expand / Collapse All Details Button (Preserves box dimensions to prevent layout shifts) -->
+            <button @click="toggleAllDetails()"
+                    :class="viewMode === 'cards' ? 'opacity-100' : 'invisible pointer-events-none'"
+                    :aria-hidden="viewMode !== 'cards'"
+                    class="btn btn-xs sm:btn-sm btn-outline border-washi-300 text-ai-900 hover:bg-washi-200 hover:border-washi-300 min-w-[11.75rem]">
+              <span x-text="allExpanded ? '🔼 Collapse All Details' : '🔽 Expand All Room Details'"></span>
             </button>
           </div>
 
-          <!-- Expand / Collapse All Details Button (When in Cards View) -->
-          <button x-show="viewMode === 'cards'"
-                  @click="toggleAllDetails()"
-                  class="btn btn-xs sm:btn-sm btn-outline border-washi-300 text-ai-900 hover:bg-washi-200 hover:border-washi-300">
-            <span x-text="allExpanded ? '🔼 Collapse All Details' : '🔽 Expand All Room Details'"></span>
-          </button>
+          <!-- Share / Active Filter Controls -->
+          <div class="flex items-center gap-2">
+            <template x-if="regionFilter !== 'all' || onlyTattooPublicBath || sortBy !== 'rank'">
+              <button @click="resetFilters()"
+                      class="btn btn-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-semibold">
+                <span x-text="'Showing ' + filteredRyokans.length + ' of 7 • Reset ✕'"></span>
+              </button>
+            </template>
+            <button @click="copyShareUrl()"
+                    class="btn btn-xs bg-washi-100 hover:bg-washi-200 text-ai-900 border border-washi-300 font-semibold">
+              <span x-text="linkCopied ? '✅ Link Copied!' : '🔗 Share Filtered View'"></span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -753,6 +775,19 @@
           </article>
         </template>
       </div>
+
+      <!-- Empty Filter State -->
+      <template x-if="filteredRyokans.length === 0">
+        <div class="wa-card rounded-2xl p-8 text-center bg-white">
+          <div class="text-lg font-bold text-ai-900">No ryokans match this filter combination</div>
+          <p class="text-xs sm:text-sm text-slate-600 mt-1">
+            (Note: Hakone's #7 Zen is an intimate 10-room boutique inn with private in-room baths only and no communal public bath.)
+          </p>
+          <button @click="resetFilters()" class="btn btn-sm bg-ai-800 hover:bg-ai-900 text-white border-none mt-4">
+            Reset All Filters
+          </button>
+        </div>
+      </template>
     </section>
 
     <!-- SECTION 3: Collapsible Planning Drawers (Booking Strategy, Transit Routes & Eliminated Traps) -->
@@ -892,6 +927,7 @@
         sortBy: 'rank',
         expandedCards: {},
         allExpanded: false,
+        linkCopied: false,
         openAccordion: 'booking',
         map: null,
         markers: {},
@@ -1260,6 +1296,12 @@
           const next = {};
           this.ryokans.forEach(r => { next[r.id] = this.allExpanded; });
           this.expandedCards = next;
+          this.syncUrlParams();
+        },
+
+        setViewMode(mode) {
+          this.viewMode = mode;
+          this.syncUrlParams();
         },
 
         toggleMap() {
@@ -1272,14 +1314,75 @@
         setRegion(reg) {
           this.regionFilter = reg;
           this.updateMapMarkers();
+          this.syncUrlParams();
         },
 
         toggleTattooFilter() {
           this.onlyTattooPublicBath = !this.onlyTattooPublicBath;
           this.updateMapMarkers();
+          this.syncUrlParams();
+        },
+
+        resetFilters() {
+          this.regionFilter = 'all';
+          this.onlyTattooPublicBath = false;
+          this.sortBy = 'rank';
+          this.updateMapMarkers();
+          this.syncUrlParams();
+        },
+
+        applyUrlParams() {
+          const params = new URLSearchParams(window.location.search);
+          const reg = params.get('region');
+          this.regionFilter = ['all', 'kawaguchiko', 'izu', 'hakone'].includes(reg) ? reg : 'all';
+
+          const tat = params.get('tattoo');
+          this.onlyTattooPublicBath = (tat === '1' || tat === 'true');
+
+          const sort = params.get('sort');
+          this.sortBy = ['rank', 'priceAsc', 'ratingDesc'].includes(sort) ? sort : 'rank';
+
+          const view = params.get('view');
+          this.viewMode = ['cards', 'table'].includes(view) ? view : 'cards';
+
+          const exp = params.get('expand');
+          if (exp === '1' || exp === 'true') {
+            this.allExpanded = true;
+            const next = {};
+            this.ryokans.forEach(r => { next[r.id] = true; });
+            this.expandedCards = next;
+          }
+        },
+
+        syncUrlParams() {
+          const params = new URLSearchParams();
+          if (this.regionFilter !== 'all') params.set('region', this.regionFilter);
+          if (this.onlyTattooPublicBath) params.set('tattoo', '1');
+          if (this.sortBy !== 'rank') params.set('sort', this.sortBy);
+          if (this.viewMode !== 'cards') params.set('view', this.viewMode);
+          if (this.allExpanded) params.set('expand', '1');
+
+          const qs = params.toString();
+          const hash = window.location.hash || '';
+          const newUrl = window.location.pathname + (qs ? '?' + qs : '') + hash;
+          window.history.replaceState({}, '', newUrl);
+        },
+
+        copyShareUrl() {
+          this.syncUrlParams();
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(window.location.href);
+          }
+          this.linkCopied = true;
+          setTimeout(() => { this.linkCopied = false; }, 2200);
         },
 
         initApp() {
+          this.applyUrlParams();
+          window.addEventListener('popstate', () => {
+            this.applyUrlParams();
+            this.updateMapMarkers();
+          });
           this.$nextTick(() => {
             this.initLeafletMap();
             GLightbox({ selector: '.glightbox', touchNavigation: true, loop: true });
