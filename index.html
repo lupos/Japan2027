@@ -533,11 +533,11 @@
                   <td class="py-3.5 px-4 align-top whitespace-nowrap text-xs space-y-1">
                     <div class="flex flex-wrap gap-1">
                       <template x-for="(v, vIdx) in r.videos" :key="vIdx">
-                        <a :href="'https://www.youtube.com/watch?v=' + v.youtubeId"
+                        <a :href="'https://www.youtube.com/watch?v=' + v.youtubeId + '&cc_load_policy=1&cc_lang_pref=en&hl=en'"
                            target="_blank" rel="noopener noreferrer"
                            class="inline-flex items-center gap-1 px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 font-semibold transition"
-                           :title="v.title + ' (Opens YouTube in new tab)'">
-                          <span>▶️ Vlog <span x-text="vIdx + 1"></span></span>
+                           :title="v.title + ' [' + v.lang + '] (Opens YouTube in new tab)'">
+                          <span>▶️ <span x-text="v.lang"></span> #<span x-text="vIdx + 1"></span></span>
                           <span class="text-[10px]">&nearr;</span>
                         </a>
                       </template>
@@ -679,10 +679,11 @@
                 <!-- Direct YouTube Anchor Links (Works with Ctrl+Click & YouTube Premium!) -->
                 <div class="flex flex-wrap items-center gap-2">
                   <template x-for="(v, vIdx) in r.videos" :key="vIdx">
-                    <a :href="'https://www.youtube.com/watch?v=' + v.youtubeId"
+                    <a :href="'https://www.youtube.com/watch?v=' + v.youtubeId + '&cc_load_policy=1&cc_lang_pref=en&hl=en'"
                        target="_blank" rel="noopener noreferrer"
                        class="btn btn-xs sm:btn-sm bg-rose-50 hover:bg-rose-600 text-rose-800 hover:text-white border border-rose-200 hover:border-rose-600 font-semibold transition gap-1.5">
                       <span>▶️ <span x-text="v.title"></span></span>
+                      <span class="px-1.5 py-0.2 rounded bg-rose-200/70 text-rose-950 text-[10px] font-bold" x-text="v.lang"></span>
                       <span class="text-[11px] opacity-80">&nearr;</span>
                     </a>
                   </template>
@@ -746,7 +747,7 @@
                 </div>
               </div>
 
-              <!-- Right 5 Cols: Full Tattoo Policy, Dining & Reviewer Verdict -->
+              <!-- Right 5 Cols: Full Tattoo Policy, Dining, Reviewer Verdict & Video Walkthroughs -->
               <div class="lg:col-span-5 space-y-3.5">
                 <div :class="r.alertType === 'red' ? 'policy-box-red' : (r.alertType === 'yellow' ? 'policy-box-yellow' : 'policy-box-green')"
                      class="rounded-xl p-4 shadow-sm">
@@ -767,6 +768,20 @@
                   <div class="border-t border-washi-200 pt-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-ai-900">🇯🇵 Reviewer Verdict &amp; Cancellation:</span>
                     <p class="text-slate-700 mt-0.5 leading-relaxed" x-html="r.verdictHtml"></p>
+                  </div>
+                  <div class="border-t border-washi-200 pt-2.5">
+                    <span class="text-xs font-bold uppercase tracking-wider text-ai-900 block mb-1.5">🎬 Video Walkthroughs (Ctrl+Click for New Tab):</span>
+                    <div class="flex flex-wrap gap-1.5">
+                      <template x-for="(v, vIdx) in r.videos" :key="'drawer-vid-' + vIdx">
+                        <a :href="'https://www.youtube.com/watch?v=' + v.youtubeId + '&cc_load_policy=1&cc_lang_pref=en&hl=en'"
+                           target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-800 hover:text-white border border-rose-200 font-semibold text-xs transition">
+                          <span>▶️ <span x-text="v.title"></span></span>
+                          <span class="px-1.5 py-0.2 rounded bg-rose-200/70 text-rose-950 text-[10px] font-bold" x-text="v.lang"></span>
+                          <span>&nearr;</span>
+                        </a>
+                      </template>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -977,7 +992,9 @@
             diningHtml: 'Linking 3 room reservations secures a dedicated <strong>private dining room (個室食事処)</strong> so all 6 adults dine together on seasonal Yamanashi Koshu beef &amp; Kaiseki.',
             verdictHtml: 'Highest-rated traditional ryokan on Lake Kawaguchiko (complimentary afternoon draft beer &amp; local wine in the lounge). <strong>Cancellation:</strong> Free until 22 days prior (21–15 days: 10%, 14–8 days: 20%, 7–2 days: 30%).',
             videos: [
-              { title: '3F Corner Terrace Onsen Room & Kaiseki Vlog', youtubeId: 'T-8fEZDZSPw' }
+              { title: 'Balcony Open-Air Onsen Room & Fuji View Tour', youtubeId: 'NdtVgXgBNZM', lang: 'EN' },
+              { title: 'Luxury Ryokan & Room Walkthrough', youtubeId: '3TokHPXT8Zc', lang: 'EN' },
+              { title: '3F Corner Terrace Onsen Room & Kaiseki Vlog', youtubeId: 'T-8fEZDZSPw', lang: 'JP' }
             ]
           },
           {
@@ -1024,8 +1041,9 @@
             diningHtml: 'Served in private <em>Ryotei</em> dining rooms (<strong>料亭個室食事処</strong>) seating all 6 adults together for Suruga Bay luxury seafood (spiny lobster, abalone, kinmedai) &amp; Wagyu Kaiseki.',
             verdictHtml: 'Beloved by Japanese repeat guests for impeccable hospitality, dramatic ocean-and-Fuji views, and easy Shinkansen logistics via Mishima Station. <strong>Cancellation:</strong> Free until 8–15 days prior on standard plans (30% from 14 or 7 days prior).',
             videos: [
-              { title: 'Suite "Tsuki" & Kaiseki Vlog', youtubeId: '41u0FQKJxh0' },
-              { title: 'Full Property & Fuji Bath Tour', youtubeId: 'bfQTkq9TtZU' }
+              { title: 'Ocean & Fuji View Stay Vlog', youtubeId: 'fX0yuZ0GDbE', lang: 'EN Audio/CC' },
+              { title: 'Suite "Tsuki" & Kaiseki Tour', youtubeId: '41u0FQKJxh0', lang: 'JP' },
+              { title: 'Full Property & Fuji Bath Tour', youtubeId: 'bfQTkq9TtZU', lang: 'Visual' }
             ]
           },
           {
@@ -1072,8 +1090,9 @@
             diningHtml: '<strong>Important Rule:</strong> Request at least 3 days in advance to dine together as 6 adults in a private dining room (<strong>個室料亭</strong>) rather than split across in-room dining tables.',
             verdictHtml: 'Includes private Sasa Lounge (free wine/beer/sweets), garden matcha tea house, and nightly Taiko drum show. <strong>Cancellation:</strong> Free until 11 days prior (10–2 days: 30%, 1 day: 50%).',
             videos: [
-              { title: '"Fukuchi" Suite & Fuji Bath', youtubeId: 'pzSEGRR_I7I' },
-              { title: 'Club Lounge, Room & Kaiseki Vlog', youtubeId: 'J1RyQeCdTks' }
+              { title: 'Bessho Sasa Suite & Lounge Review', youtubeId: 'QLgpXcvZ_Tk', lang: 'EN' },
+              { title: 'Bessho Sasa Private Onsen Experience', youtubeId: 'KJgQjXP0TyU', lang: 'EN' },
+              { title: 'Full Resort, Garden & Suite Tour', youtubeId: 'w2CmIucWbIM', lang: 'EN CC' }
             ]
           },
           {
@@ -1120,8 +1139,9 @@
             diningHtml: 'Features dedicated private <em>Ryotei</em> dining rooms (<strong>料亭個室</strong>) built specifically for multi-room family/group Kaiseki dinners.',
             verdictHtml: '10-minute walk from Kawaguchiko Station. High room inventory makes securing 3 Mt. Fuji-side rooms much easier than tiny boutique inns. <strong>Cancellation:</strong> 100% Free until 8 days prior (7–4 days: 20%, 3–2 days: 30%, 1 day: 50%).',
             videos: [
-              { title: 'Fuji-Side Onsen Room & Rooftop Footbath', youtubeId: 'zPdK5KWJ878' },
-              { title: 'Open-Air Bath & Group Dining Tour', youtubeId: '78P5rclOeV0' }
+              { title: 'Mt. Fuji Room & Open-Air Bath Tour', youtubeId: 'Py4XXTvBmGw', lang: 'EN' },
+              { title: 'Konansou Stay, Onsen & Kaiseki Vlog', youtubeId: 'hRuZXpk9Z8o', lang: 'EN' },
+              { title: 'Fuji-Side Onsen Room & Rooftop Footbath', youtubeId: 'zPdK5KWJ878', lang: 'JP' }
             ]
           },
           {
@@ -1168,8 +1188,9 @@
             diningHtml: '100% of dinners and breakfasts are served in <strong>completely private dining rooms (完全個室食事処)</strong> seating all 6 adults together. Famous for Shizuoka A5 Wagyu aburi sushi/steak and braised Kinmedai.',
             verdictHtml: 'Best value on the list ($480–$830/room) with true free-flowing spring water and chef-driven cuisine, 25 min from Mishima Station. <strong>Cancellation:</strong> Free until 11 days prior (10–4 days: 10%, 3–2 days: 30%).',
             videos: [
-              { title: 'Renovated 46㎡ Onsen Room Tour', youtubeId: 'qZ-a_g7atDs' },
-              { title: 'Stay Vlog, Bath & Kaiseki', youtubeId: 'A3b9SQAidmk' }
+              { title: 'Official English Property & Bath Guide', youtubeId: '08ICBL7xryQ', lang: 'EN' },
+              { title: 'Stay Vlog, Free-Flowing Bath & Kaiseki', youtubeId: 'A3b9SQAidmk', lang: 'EN Audio/CC' },
+              { title: 'Renovated 46㎡ Onsen Room Tour', youtubeId: 'qZ-a_g7atDs', lang: 'Visual' }
             ]
           },
           {
@@ -1216,8 +1237,9 @@
             diningHtml: 'Serves creative "Izu French Kaiseki" (eaten with chopsticks) in private dining rooms—request a combined 6-person private dining room when booking 3 suites.',
             verdictHtml: 'Awarded <strong>1 Michelin Key (2024/2025)</strong>. Furthest drive from Mishima Station (~65–75 min). <strong>Cancellation:</strong> Free until 8–15 days prior on standard plans (avoid early-bird <code>さき楽45</code> plans).',
             videos: [
-              { title: '130㎡ Suite & French Kaiseki Vlog', youtubeId: 'WuOpvRMBfQ4' },
-              { title: 'Suite & Over-Ocean Fuji Bath Tour', youtubeId: 'QoDblR6KOJE' }
+              { title: 'Full 130㎡ Suite, Fuji Bath & Dining Review', youtubeId: '6lnccs8vX3c', lang: 'EN CC' },
+              { title: '8-Suite Clifftop Onsen & View Tour', youtubeId: 'orhpvD7gDxk', lang: 'EN CC' },
+              { title: 'Suite & French Kaiseki Vlog', youtubeId: 'WuOpvRMBfQ4', lang: 'EN Sub' }
             ]
           },
           {
@@ -1264,8 +1286,8 @@
             diningHtml: 'Served in private dining rooms (<strong>個室ダイニング</strong>) where all 6 adults can dine together on seasonal Sousaku Kaiseki featuring Sagami Bay seafood and Ashigara Wagyu.',
             verdictHtml: 'Ideal only if you specifically want Hakone’s famous milky-white sulfur water (にごり湯). For full base-to-peak views of Mt. Fuji, Kawaguchiko (#1, #4) or Suruga Bay (#2, #5) are much more dramatic. <strong>Cancellation:</strong> Free until 8 days prior on standard plans.',
             videos: [
-              { title: 'Milky Onsen, Fuji View & Kaiseki Vlog', youtubeId: 'yPOOJBzv334' },
-              { title: 'Room & Dining Walkthrough', youtubeId: 'sFYFt-CksqM' }
+              { title: 'Private Onsen Room & Kaiseki Stay Vlog', youtubeId: '9TnllwJccbA', lang: 'EN Audio/CC' },
+              { title: 'Milky Onsen, Fuji View & Kaiseki Vlog', youtubeId: 'yPOOJBzv334', lang: 'JP' }
             ]
           }
         ],
